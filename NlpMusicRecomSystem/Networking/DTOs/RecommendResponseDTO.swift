@@ -11,36 +11,31 @@ import Foundation
 /// The actual structure depends on the `RecommendationEngine.recommend()` output.
 /// This is a flexible container that captures the recommendation results.
 struct RecommendResponseDTO: Decodable {
-    let songs: [SongDTO]
-    let moodVector: [Double]?
+    let mode: String?
+    let recommendations: [SongDTO]
 }
 
 /// Individual song from the API response.
 /// Maps to the data returned by the recommendation engine.
 struct SongDTO: Decodable {
-    let index: Int?
-    let title: String?
-    let artist: String?
-    let album: String?
-    let genre: String?
+    let trackName: String?
+    let artists: String?
+    let trackGenre: String?
+    let popularity: Int?
     let score: Double?
-    let artworkUrl: String?
-    let previewUrl: String?
-    let durationInSeconds: Int?
-    let moodTags: [String]?
 
     /// Converts the API response into the app's domain `Song` model.
     func toDomain() -> Song {
         Song(
-            id: index.map(String.init) ?? UUID().uuidString,
-            title: title ?? "Unknown",
-            artistName: artist ?? "Unknown Artist",
-            albumName: album ?? "Unknown Album",
-            artworkURLString: artworkUrl,
-            previewURLString: previewUrl,
-            genre: genre ?? "Unknown",
-            moodTags: moodTags ?? [],
-            durationInSeconds: durationInSeconds ?? 0
+            id: UUID().uuidString,
+            title: trackName ?? "Unknown",
+            artistName: artists ?? "Unknown Artist",
+            albumName: "Unknown Album",
+            artworkURLString: nil,
+            previewURLString: nil,
+            genre: trackGenre ?? "Unknown",
+            moodTags: [],
+            durationInSeconds: 0
         )
     }
 }
