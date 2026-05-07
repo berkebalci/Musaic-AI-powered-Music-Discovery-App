@@ -6,6 +6,6 @@
 import Foundation
 
 protocol FeedbackServiceProtocol {
-    /// Records a user interaction (like/dislike) for model retraining.
-    func recordInteraction(_ interaction: UserInteraction) async throws
+    /// Records a user swipe action (like/dislike) for a specific song.
+    func recordSwipe(songIndex: Int, action: String) async throws
 }

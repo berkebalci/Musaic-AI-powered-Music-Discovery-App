@@ -6,6 +6,7 @@
 import Foundation
 
 protocol RecommendationServiceProtocol {
-    /// Takes a mood vector and returns recommended songs from the ML model.
-    func getRecommendations(for mood: MoodVector) async throws -> [Song]
+    /// Takes a mood text string and returns recommended songs from the API.
+    /// The NLP analysis is performed server-side.
+    func getRecommendations(for moodText: String) async throws -> [Song]
 }

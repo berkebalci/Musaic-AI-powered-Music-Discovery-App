@@ -22,7 +22,6 @@ final class DiscoveryViewModel: ObservableObject {
     @Published var moodText: String = ""
     @Published var state: DiscoveryState = .moodInput
     @Published var cards: [Song] = []
-    @Published private(set) var currentMoodVector: MoodVector?
 
     var currentSong: Song? { cards.first }
     var visibleCards: [Song] { Array(cards.prefix(3)) }
@@ -37,7 +36,6 @@ final class DiscoveryViewModel: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let nlpService: any NLPServiceProtocol
     private let recommendationService: any RecommendationServiceProtocol
     private let favoritesService: any FavoritesServiceProtocol
     private let feedbackService: any FeedbackServiceProtocol
@@ -45,12 +43,10 @@ final class DiscoveryViewModel: ObservableObject {
     // MARK: - Init
 
     init(
-        nlpService: any NLPServiceProtocol,
         recommendationService: any RecommendationServiceProtocol,
         favoritesService: any FavoritesServiceProtocol,
         feedbackService: any FeedbackServiceProtocol
     ) {
-        self.nlpService = nlpService
         self.recommendationService = recommendationService
         self.favoritesService = favoritesService
         self.feedbackService = feedbackService
@@ -62,6 +58,8 @@ final class DiscoveryViewModel: ObservableObject {
         moodText = preset
     }
 
+    /// Sends the mood text directly to the API.
+    /// NLP analysis is performed server-side — no local MoodVector needed.
     @MainActor
     func analyzeMoodAndFetchSongs() async {
         guard !moodText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
@@ -69,10 +67,7 @@ final class DiscoveryViewModel: ObservableObject {
         state = .loading
 
         do {
-            let moodVector = try await nlpService.analyzeMood(from: moodText)
-            currentMoodVector = moodVector
-
-            let songs = try await recommendationService.getRecommendations(for: moodVector)
+            let songs = try await recommendationService.getRecommendations(for: moodText)
             cards = songs
 
             state = songs.isEmpty ? .empty : .swipeCards
@@ -83,15 +78,9 @@ final class DiscoveryViewModel: ObservableObject {
 
     @MainActor
     func swipeRight(on song: Song) async {
-        guard let mood = currentMoodVector else { return }
+        guard let songIndex = Int(song.id) else { return }
 
-        let interaction = UserInteraction(
-            songId: song.id,
-            moodVector: mood,
-            label: 1
-        )
-
-        try? await feedbackService.recordInteraction(interaction)
+        try? await feedbackService.recordSwipe(songIndex: songIndex, action: "like")
         try? await favoritesService.addFavorite(song)
 
         removeTopCard()
@@ -99,15 +88,9 @@ final class DiscoveryViewModel: ObservableObject {
 
     @MainActor
     func swipeLeft(on song: Song) async {
-        guard let mood = currentMoodVector else { return }
+        guard let songIndex = Int(song.id) else { return }
 
-        let interaction = UserInteraction(
-            songId: song.id,
-            moodVector: mood,
-            label: 0
-        )
-
-        try? await feedbackService.recordInteraction(interaction)
+        try? await feedbackService.recordSwipe(songIndex: songIndex, action: "dislike")
 
         removeTopCard()
     }

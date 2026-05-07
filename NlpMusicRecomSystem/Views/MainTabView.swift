@@ -18,7 +18,6 @@ struct MainTabView: View {
 
     init(container: DIContainer) {
         _discoveryViewModel = StateObject(wrappedValue: DiscoveryViewModel(
-            nlpService: container.nlpService,
             recommendationService: container.recommendationService,
             favoritesService: container.favoritesService,
             feedbackService: container.feedbackService

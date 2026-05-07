@@ -10,9 +10,9 @@ import SwiftUI
 @main
 struct NlpMusicRecomSystemApp: App {
 
-    /// DI container with mock services for development.
-    /// Swap to `.live()` when real APIs are integrated.
-    private let container = DIContainer.mock()
+    /// DI container with real API-backed services.
+    /// Swap to `.mock()` for UI development without a running server.
+    private let container = DIContainer.live()
 
     var body: some Scene {
         WindowGroup {

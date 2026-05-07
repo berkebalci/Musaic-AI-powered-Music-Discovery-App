@@ -34,12 +34,12 @@ final class MockRecommendationService: RecommendationServiceProtocol {
              genre: "Indie Pop", moodTags: ["Melancholic", "Atmospheric"], durationInSeconds: 325),
     ]
 
-    func getRecommendations(for mood: MoodVector) async throws -> [Song] {
+    func getRecommendations(for moodText: String) async throws -> [Song] {
         // Simulate processing delay
         try await Task.sleep(nanoseconds: 500_000_000)
 
         // Simple mock: shuffle and return 5 songs
-        // In production, the ML model would rank songs by mood vector similarity
+        // In production, the API handles NLP + recommendations
         return Array(mockCatalog.shuffled().prefix(5))
     }
 }
