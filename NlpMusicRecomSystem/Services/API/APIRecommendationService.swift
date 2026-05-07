@@ -25,13 +25,18 @@ final class APIRecommendationService: RecommendationServiceProtocol {
             userId: userId,
             moodText: moodText
         )
+        
+        print("🎵 /recommend isteği başlatıldı. Gönderilen metin: '\(moodText)'")
 
         let response = try await apiClient.post(
             url: APIEnvironment.recommendURL,
             body: requestBody,
             responseType: RecommendResponseDTO.self
         )
+        
+        print("✅ Başarılı! Sunucudan gelen ham veri:")
+        print(response)
 
-        return response.songs.map { $0.toDomain() }
+        return response.recommendations.map { $0.toDomain() }
     }
 }
