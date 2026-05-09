@@ -20,13 +20,11 @@ import Foundation
 /// The server processes it via NLP and generates recommendations.
 struct RecommendRequestDTO: Encodable {
     let userId: String
-    let moodText: String?
-    let moodVector: [Double]?
+    let moodVector: [Double]
     let n: Int
 
-    init(userId: String, moodText: String? = nil, moodVector: [Double]? = nil, n: Int = 10) {
+    init(userId: String, moodVector: [Double], n: Int = 10) {
         self.userId = userId
-        self.moodText = moodText
         self.moodVector = moodVector
         self.n = n
     }

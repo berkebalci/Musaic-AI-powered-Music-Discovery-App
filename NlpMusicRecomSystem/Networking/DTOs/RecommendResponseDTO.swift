@@ -25,9 +25,9 @@ struct SongDTO: Decodable {
     let score: Double?
 
     /// Converts the API response into the app's domain `Song` model.
-    func toDomain() -> Song {
+    func toDomain(index: Int) -> Song {
         Song(
-            id: UUID().uuidString,
+            id: String(index),
             title: trackName ?? "Unknown",
             artistName: artists ?? "Unknown Artist",
             albumName: "Unknown Album",

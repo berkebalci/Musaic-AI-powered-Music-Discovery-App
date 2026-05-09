@@ -22,5 +22,5 @@ struct ChatRequestDTO: Encodable {
 /// Response from `POST /chat`.
 struct ChatResponseDTO: Decodable {
     let reply: String
-    let songs: [SongDTO]
+    let vector: [Double]
 }
