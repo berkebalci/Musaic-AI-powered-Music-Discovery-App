@@ -22,7 +22,7 @@ final class DiscoveryViewModel: ObservableObject {
     @Published var moodText: String = ""
     @Published var state: DiscoveryState = .moodInput
     @Published var cards: [Song] = []
-
+   
     var currentSong: Song? { cards.first }
     var visibleCards: [Song] { Array(cards.prefix(3)) }
 
@@ -68,6 +68,7 @@ final class DiscoveryViewModel: ObservableObject {
 
         do {
             let songs = try await recommendationService.getRecommendations(for: moodText)
+
             cards = songs
 
             state = songs.isEmpty ? .empty : .swipeCards
@@ -78,7 +79,8 @@ final class DiscoveryViewModel: ObservableObject {
 
     @MainActor
     func swipeRight(on song: Song) async {
-        guard let songIndex = Int(song.id) else { return }
+        print("saga kaydirildi, song title: \(song.title)")
+        let songIndex = Int(song.id) ?? 0
 
         try? await feedbackService.recordSwipe(songIndex: songIndex, action: "like")
         try? await favoritesService.addFavorite(song)
@@ -88,7 +90,7 @@ final class DiscoveryViewModel: ObservableObject {
 
     @MainActor
     func swipeLeft(on song: Song) async {
-        guard let songIndex = Int(song.id) else { return }
+        let songIndex = Int(song.id) ?? 0
 
         try? await feedbackService.recordSwipe(songIndex: songIndex, action: "dislike")
 
