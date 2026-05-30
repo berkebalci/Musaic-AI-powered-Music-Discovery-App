@@ -11,15 +11,18 @@ final class DIContainer {
     let recommendationService: any RecommendationServiceProtocol
     let favoritesService: any FavoritesServiceProtocol
     let feedbackService: any FeedbackServiceProtocol
+    let authService: any AuthServiceProtocol
 
     init(
         recommendationService: any RecommendationServiceProtocol,
         favoritesService: any FavoritesServiceProtocol,
-        feedbackService: any FeedbackServiceProtocol
+        feedbackService: any FeedbackServiceProtocol,
+        authService: any AuthServiceProtocol
     ) {
         self.recommendationService = recommendationService
         self.favoritesService = favoritesService
         self.feedbackService = feedbackService
+        self.authService = authService
     }
 
     /// Creates a container with all mock services for UI development.
@@ -27,7 +30,8 @@ final class DIContainer {
         DIContainer(
             recommendationService: MockRecommendationService(),
             favoritesService: MockFavoritesService(),
-            feedbackService: MockFeedbackService()
+            feedbackService: MockFeedbackService(),
+            authService: FirebaseAuthService()
         )
     }
 
@@ -49,7 +53,9 @@ final class DIContainer {
             feedbackService: APIFeedbackService(
                 apiClient: apiClient,
                 userId: userId
-            )
+            ),
+            authService: FirebaseAuthService()
         )
     }
 }
+

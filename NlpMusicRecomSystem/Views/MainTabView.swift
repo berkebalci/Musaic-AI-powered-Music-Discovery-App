@@ -7,6 +7,10 @@ import SwiftUI
 
 struct MainTabView: View {
 
+    // MARK: - Dependencies
+
+    private let container: DIContainer
+
     // MARK: - State
 
     @State private var selectedTab: AppTab = .discovery
@@ -17,6 +21,7 @@ struct MainTabView: View {
     // MARK: - Init
 
     init(container: DIContainer) {
+        self.container = container
         _discoveryViewModel = StateObject(wrappedValue: DiscoveryViewModel(
             recommendationService: container.recommendationService,
             favoritesService: container.favoritesService,
@@ -48,7 +53,7 @@ struct MainTabView: View {
                         audioPlayer: audioPlayerViewModel
                     )
                 case .profile:
-                    ProfileView()
+                    ProfileView(authService: container.authService)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

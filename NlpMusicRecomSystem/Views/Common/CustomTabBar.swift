@@ -66,3 +66,4 @@ struct CustomTabBar: View {
             .ignoresSafeArea(.container, edges: .bottom)
     }
 }
+

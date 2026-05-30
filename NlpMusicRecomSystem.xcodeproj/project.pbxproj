@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F46749132FCAF4720053F96B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = F46749122FCAF4720053F96B /* FirebaseAuth */; };
 		F4A162512FC62D9800C3077E /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = F4A162502FC62D9800C3077E /* FirebaseAnalytics */; };
 /* End PBXBuildFile section */
 
@@ -70,6 +71,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4A162512FC62D9800C3077E /* FirebaseAnalytics in Frameworks */,
+				F46749132FCAF4720053F96B /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,12 +92,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F46749112FCAF4720053F96B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F4A6EE5D2F863C3300F434A1 = {
 			isa = PBXGroup;
 			children = (
 				F4A6EE682F863C3300F434A1 /* NlpMusicRecomSystem */,
 				F4A6EE762F863C3500F434A1 /* NlpMusicRecomSystemTests */,
 				F4A6EE802F863C3500F434A1 /* NlpMusicRecomSystemUITests */,
+				F46749112FCAF4720053F96B /* Frameworks */,
 				F4A6EE672F863C3300F434A1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -131,6 +141,7 @@
 			name = NlpMusicRecomSystem;
 			packageProductDependencies = (
 				F4A162502FC62D9800C3077E /* FirebaseAnalytics */,
+				F46749122FCAF4720053F96B /* FirebaseAuth */,
 			);
 			productName = NlpMusicRecomSystem;
 			productReference = F4A6EE662F863C3300F434A1 /* NlpMusicRecomSystem.app */;
@@ -611,6 +622,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		F46749122FCAF4720053F96B /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4A1624F2FC62D9800C3077E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
 		F4A162502FC62D9800C3077E /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F4A1624F2FC62D9800C3077E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
