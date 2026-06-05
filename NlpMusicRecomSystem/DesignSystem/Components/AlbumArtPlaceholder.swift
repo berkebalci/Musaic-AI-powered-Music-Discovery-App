@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct AlbumArtPlaceholder: View {
-    let songId: String
+    let songId: Int
     let size: CGFloat
     var cornerRadius: CGFloat? = nil
 

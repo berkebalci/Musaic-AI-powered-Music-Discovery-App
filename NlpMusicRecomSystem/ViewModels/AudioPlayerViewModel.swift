@@ -35,7 +35,7 @@ final class AudioPlayerViewModel: ObservableObject {
         }
         currentSong = song
         progress = 0
-        duration = Double(song.durationInSeconds > 0 ? min(song.durationInSeconds, 30) : 30)
+        duration = 30.0
         isPlaying = true
         startSimulation()
     }

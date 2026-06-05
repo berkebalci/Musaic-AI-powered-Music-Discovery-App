@@ -75,7 +75,7 @@ enum Theme {
         [Color(hex: "#1A2980"), Color(hex: "#26D0CE")],
     ]
 
-    static func albumArtGradient(for songId: String) -> [Color] {
+    static func albumArtGradient(for songId: Int) -> [Color] {
         let hash = abs(songId.hashValue) % albumGradients.count
         return albumGradients[hash]
     }

@@ -7,7 +7,13 @@ import Foundation
 
 final class MockFeedbackService: FeedbackServiceProtocol {
 
-    func recordSwipe(songIndex: Int, action: String) async throws {
-        print("[MockFeedback] Recorded swipe: songIndex=\(songIndex), action=\(action)")
+    @discardableResult
+    func submitSwipeSession(
+        likedSongs: [LikedSongItemDTO],
+        dislikedSongIds: [Int],
+        currentMoodVector: [Double]
+    ) async throws -> [Double] {
+        print("[MockFeedback] Session submitted: \(likedSongs.count) likes, \(dislikedSongIds.count) dislikes")
+        return currentMoodVector
     }
 }

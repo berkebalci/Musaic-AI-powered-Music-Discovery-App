@@ -13,22 +13,29 @@ final class MockNLPService: NLPServiceProtocol {
 
         let lowered = text.lowercased()
 
-        // Simple keyword-based mock analysis
+        // Simple keyword-based mock analysis returning 9-dimensional vector
         if lowered.contains("sad") || lowered.contains("melanchol") || lowered.contains("cry") {
-            return MoodVector(sadness: 0.8, energy: 0.2, tempo: 0.25)
+            return MoodVector(danceability: 0.2, energy: 0.2, valence: 0.1, tempo: 0.3,
+                            acousticness: 0.7, instrumentalness: 0.3, speechiness: 0.1, loudness: 0.3, liveness: 0.1)
         } else if lowered.contains("energetic") || lowered.contains("workout") || lowered.contains("pump") {
-            return MoodVector(sadness: 0.1, energy: 0.9, tempo: 0.85)
+            return MoodVector(danceability: 0.9, energy: 0.9, valence: 0.7, tempo: 0.85,
+                            acousticness: 0.1, instrumentalness: 0.1, speechiness: 0.2, loudness: 0.8, liveness: 0.3)
         } else if lowered.contains("chill") || lowered.contains("relax") || lowered.contains("mellow") || lowered.contains("rainy") {
-            return MoodVector(sadness: 0.3, energy: 0.2, tempo: 0.3)
+            return MoodVector(danceability: 0.3, energy: 0.2, valence: 0.4, tempo: 0.3,
+                            acousticness: 0.6, instrumentalness: 0.4, speechiness: 0.1, loudness: 0.3, liveness: 0.1)
         } else if lowered.contains("happy") || lowered.contains("joy") || lowered.contains("excited") {
-            return MoodVector(sadness: 0.05, energy: 0.7, tempo: 0.7)
+            return MoodVector(danceability: 0.8, energy: 0.7, valence: 0.9, tempo: 0.7,
+                            acousticness: 0.2, instrumentalness: 0.1, speechiness: 0.1, loudness: 0.6, liveness: 0.2)
         } else if lowered.contains("midnight") || lowered.contains("drive") || lowered.contains("night") {
-            return MoodVector(sadness: 0.4, energy: 0.5, tempo: 0.55)
+            return MoodVector(danceability: 0.5, energy: 0.5, valence: 0.4, tempo: 0.55,
+                            acousticness: 0.3, instrumentalness: 0.4, speechiness: 0.1, loudness: 0.5, liveness: 0.1)
         } else if lowered.contains("focused") || lowered.contains("study") || lowered.contains("concentrate") {
-            return MoodVector(sadness: 0.15, energy: 0.4, tempo: 0.45)
+            return MoodVector(danceability: 0.3, energy: 0.4, valence: 0.5, tempo: 0.45,
+                            acousticness: 0.4, instrumentalness: 0.7, speechiness: 0.05, loudness: 0.4, liveness: 0.1)
         } else {
             // Default balanced mood
-            return MoodVector(sadness: 0.3, energy: 0.5, tempo: 0.5)
+            return MoodVector(danceability: 0.5, energy: 0.5, valence: 0.5, tempo: 0.5,
+                            acousticness: 0.5, instrumentalness: 0.5, speechiness: 0.5, loudness: 0.5, liveness: 0.5)
         }
     }
 }

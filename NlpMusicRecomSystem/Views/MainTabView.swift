@@ -24,7 +24,6 @@ struct MainTabView: View {
         self.container = container
         _discoveryViewModel = StateObject(wrappedValue: DiscoveryViewModel(
             recommendationService: container.recommendationService,
-            favoritesService: container.favoritesService,
             feedbackService: container.feedbackService
         ))
         _favoritesViewModel = StateObject(wrappedValue: FavoritesViewModel(

@@ -69,7 +69,7 @@ struct ProfileView: View {
                     )
                 }
                 .padding(.horizontal, 24)
-                .padding(.bottom, 32)
+                .padding(.bottom, 120) // Tab bar'ın arkasında kalmaması için padding artırıldı
             }
         }
         .alert("Sign Out", isPresented: $showSignOutAlert) {

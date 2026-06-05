@@ -47,23 +47,4 @@ final class FavoritesViewModel: ObservableObject {
         }
         isLoading = false
     }
-
-    @MainActor
-    func removeFavorite(at offsets: IndexSet) {
-        let songsToRemove = offsets.map { filteredFavorites[$0] }
-        for song in songsToRemove {
-            Task {
-                try? await favoritesService.removeFavorite(songId: song.id)
-                await loadFavorites()
-            }
-        }
-    }
-
-    @MainActor
-    func removeFavorite(song: Song) {
-        Task {
-            try? await favoritesService.removeFavorite(songId: song.id)
-            await loadFavorites()
-        }
-    }
 }

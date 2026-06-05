@@ -2,25 +2,22 @@
 //  APIChatService.swift
 //  NlpMusicRecomSystem
 //
+//  Authentication is handled by the APIClient's token provider.
+//
 
 import Foundation
 
 final class APIChatService: ChatServiceProtocol {
     private let apiClient: APIClientProtocol
-    private let userId: String
 
-    init(apiClient: APIClientProtocol, userId: String = UUID().uuidString) {
+    init(apiClient: APIClientProtocol) {
         self.apiClient = apiClient
-        self.userId = userId
     }
 
     func sendMessage(_ message: String) async throws -> ChatResponseDTO {
-        let requestBody = ChatRequestDTO(
-            userId: userId,
-            message: message
-        )
+        let requestBody = ChatRequestDTO(message: message)
         
-        print("💬 /chat isteği başlatıldı. Mesaj: '\(message)'")
+        print("💬 /api/chat isteği başlatıldı. Mesaj: '\(message)'")
 
         let response = try await apiClient.post(
             url: APIEnvironment.chatURL,
@@ -28,7 +25,7 @@ final class APIChatService: ChatServiceProtocol {
             responseType: ChatResponseDTO.self
         )
         
-        print("✅ /chat başarılı! Sunucu cevabı: \(response.reply)")
+        print("✅ /api/chat başarılı! Sunucu cevabı: \(response.reply)")
         print("Vektör uzunluğu: \(response.vector.count)")
         
         return response

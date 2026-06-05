@@ -2,28 +2,48 @@
 //  SwipeRequestDTO.swift
 //  NlpMusicRecomSystem
 //
-//  Data Transfer Object for the /swipe endpoint request.
+//  Data Transfer Object for the /api/swipe endpoint.
+//  The API uses a batch swipe model with separate liked/disliked collections.
+//  Authentication is handled via Firebase ID token in the Authorization header.
 //
 
 import Foundation
 
-/// Request body sent to `POST /swipe`.
-/// Matches the FastAPI `SwipeRequest` model:
+/// A liked song with full details for Firestore storage.
+/// Matches the FastAPI `LikedSongItem` model:
 /// ```python
-/// class SwipeRequest(BaseModel):
-///     user_id: str
-///     song_index: int
-///     action: str  # "like" or "dislike"
+/// class LikedSongItem(BaseModel):
+///     song_id: int
+///     title: str
+///     artist: str
+///     album_art: Optional[str] = ""
+///     apple_music_id: Optional[str] = ""
 /// ```
-struct SwipeRequestDTO: Encodable {
-    let userId: String
-    let songIndex: Int
-    let action: String  // "like" or "dislike"
+struct LikedSongItemDTO: Encodable {
+    let songId: Int
+    let title: String
+    let artist: String
+    let albumArt: String
+    let appleMusicId: String
 }
 
-/// Response from `POST /swipe`.
-struct SwipeResponseDTO: Decodable {
+/// Request body sent to `POST /api/swipe`.
+/// Matches the FastAPI `BatchSwipeRequest` model:
+/// ```python
+/// class BatchSwipeRequest(BaseModel):
+///     liked_songs: List[LikedSongItem]
+///     disliked_song_ids: List[int]
+///     current_mood_vector: List[float]
+/// ```
+struct BatchSwipeRequestDTO: Encodable {
+    let likedSongs: [LikedSongItemDTO]
+    let dislikedSongIds: [Int]
+    let currentMoodVector: [Double]
+}
+
+/// Response from `POST /api/swipe`.
+struct BatchSwipeResponseDTO: Decodable {
     let status: String
-    let totalLikes: Int
-    let personalized: Bool
+    let newVector: [Double]
+    let message: String
 }

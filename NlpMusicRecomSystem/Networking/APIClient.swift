@@ -4,6 +4,7 @@
 //
 //  A lightweight, protocol-oriented networking client built on URLSession.
 //  Uses Swift Concurrency (async/await) — Apple's recommended approach.
+//  Supports Firebase ID token authentication via a token provider closure.
 //
 
 import Foundation
@@ -15,6 +16,7 @@ enum APIError: LocalizedError {
     case httpError(statusCode: Int, data: Data?)
     case decodingFailed(Error)
     case networkUnavailable
+    case authenticationRequired
     case unknown(Error)
 
     var errorDescription: String? {
@@ -27,6 +29,8 @@ enum APIError: LocalizedError {
             return "Sunucu yanıtı okunamadı."
         case .networkUnavailable:
             return "İnternet bağlantınızı kontrol edin."
+        case .authenticationRequired:
+            return "Oturum açmanız gerekiyor."
         case .unknown(let error):
             return error.localizedDescription
         }
@@ -56,8 +60,16 @@ final class APIClient: APIClientProtocol {
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
 
-    init(session: URLSession = .shared) {
+    /// Closure that provides a fresh Firebase ID token for authenticated requests.
+    /// Set this to `nil` for unauthenticated endpoints (e.g., /health).
+    private let authTokenProvider: (() async throws -> String)?
+
+    init(
+        session: URLSession = .shared,
+        authTokenProvider: (() async throws -> String)? = nil
+    ) {
         self.session = session
+        self.authTokenProvider = authTokenProvider
 
         self.decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -81,6 +93,9 @@ final class APIClient: APIClientProtocol {
         // Timeout configuration
         request.timeoutInterval = 30
 
+        // Attach auth token if provider is available
+        try await attachAuthToken(to: &request)
+
         return try await perform(request, responseType: responseType)
     }
 
@@ -94,7 +109,18 @@ final class APIClient: APIClientProtocol {
         request.httpMethod = "GET"
         request.timeoutInterval = 15
 
+        // Attach auth token if provider is available
+        try await attachAuthToken(to: &request)
+
         return try await perform(request, responseType: responseType)
+    }
+
+    // MARK: - Auth Token
+
+    private func attachAuthToken(to request: inout URLRequest) async throws {
+        guard let provider = authTokenProvider else { return }
+        let token = try await provider()
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     }
 
     // MARK: - Core Request Execution
@@ -116,6 +142,11 @@ final class APIClient: APIClientProtocol {
 
         guard let httpResponse = urlResponse as? HTTPURLResponse else {
             throw APIError.invalidResponse
+        }
+
+        // Handle 401/403 as authentication errors
+        if httpResponse.statusCode == 401 || httpResponse.statusCode == 403 {
+            throw APIError.authenticationRequired
         }
 
         guard (200...299).contains(httpResponse.statusCode) else {

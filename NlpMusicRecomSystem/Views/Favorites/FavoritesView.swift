@@ -122,8 +122,7 @@ struct FavoritesView: View {
                     SongRowView(
                         song: song,
                         isPlaying: audioPlayer.currentSong?.id == song.id && audioPlayer.isPlaying,
-                        onPlay: { audioPlayer.play(song: song) },
-                        onDelete: { viewModel.removeFavorite(song: song) }
+                        onPlay: { audioPlayer.play(song: song) }
                     )
                 }
             }

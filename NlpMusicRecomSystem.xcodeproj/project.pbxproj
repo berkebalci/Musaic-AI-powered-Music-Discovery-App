@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F4496F382FCB76CA000C3AF0 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = F4496F372FCB76CA000C3AF0 /* FirebaseFirestore */; };
 		F46749132FCAF4720053F96B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = F46749122FCAF4720053F96B /* FirebaseAuth */; };
 		F4A162512FC62D9800C3077E /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = F4A162502FC62D9800C3077E /* FirebaseAnalytics */; };
 /* End PBXBuildFile section */
@@ -72,6 +73,7 @@
 			files = (
 				F4A162512FC62D9800C3077E /* FirebaseAnalytics in Frameworks */,
 				F46749132FCAF4720053F96B /* FirebaseAuth in Frameworks */,
+				F4496F382FCB76CA000C3AF0 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,6 +144,7 @@
 			packageProductDependencies = (
 				F4A162502FC62D9800C3077E /* FirebaseAnalytics */,
 				F46749122FCAF4720053F96B /* FirebaseAuth */,
+				F4496F372FCB76CA000C3AF0 /* FirebaseFirestore */,
 			);
 			productName = NlpMusicRecomSystem;
 			productReference = F4A6EE662F863C3300F434A1 /* NlpMusicRecomSystem.app */;
@@ -622,6 +625,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		F4496F372FCB76CA000C3AF0 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4A1624F2FC62D9800C3077E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
 		F46749122FCAF4720053F96B /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F4A1624F2FC62D9800C3077E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

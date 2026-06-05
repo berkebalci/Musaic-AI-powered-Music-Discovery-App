@@ -36,14 +36,14 @@ enum APIEnvironment {
 
     // MARK: - Endpoints
 
-    /// POST /recommend
+    /// POST /api/recommend
     static var recommendURL: URL {
-        baseURL.appendingPathComponent("recommend")
+        baseURL.appendingPathComponent("api/recommend")
     }
 
-    /// POST /swipe
+    /// POST /api/swipe
     static var swipeURL: URL {
-        baseURL.appendingPathComponent("swipe")
+        baseURL.appendingPathComponent("api/swipe")
     }
 
     /// GET /health
@@ -51,8 +51,13 @@ enum APIEnvironment {
         baseURL.appendingPathComponent("health")
     }
 
-    /// POST /chat
+    /// POST /api/chat
     static var chatURL: URL {
-        baseURL.appendingPathComponent("chat")
+        baseURL.appendingPathComponent("api/chat")
+    }
+
+    /// GET /api/favorites
+    static var favoritesURL: URL {
+        baseURL.appendingPathComponent("api/favorites")
     }
 }

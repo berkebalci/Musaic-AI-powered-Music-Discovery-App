@@ -128,10 +128,6 @@ struct DiscoverySwipeView: View {
 
             // Tags
             HStack(spacing: 8) {
-                ForEach(Array(song.moodTags.prefix(2)), id: \.self) { tag in
-                    tagChip(icon: tag == song.genre ? "music.note" : "face.smiling", text: tag)
-                }
-
                 if !song.genre.isEmpty {
                     tagChip(icon: "guitars.fill", text: song.genre)
                 }

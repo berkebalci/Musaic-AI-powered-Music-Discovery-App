@@ -2,33 +2,30 @@
 //  Song.swift
 //  NlpMusicRecomSystem
 //
+//  Domain model representing a song.
+//  Simplified to match the new API response structure.
+//
 
 import Foundation
 
-struct Song: Identifiable, Codable, Equatable {
-    let id: String
+struct Song: Identifiable, Equatable {
+    /// Unique song identifier from the API (`song_id`).
+    let id: Int
+    /// Track name from the API.
     let title: String
+    /// Artist name(s) from the API.
     let artistName: String
-    let albumName: String
-    let artworkURLString: String?
-    let previewURLString: String?
+    /// Genre from the API (optional, not all endpoints return it).
     let genre: String
-    let moodTags: [String]
-    let durationInSeconds: Int
+    /// Image URL string from the API.
+    let imageUrl: String?
+    /// Popularity score (optional, from recommend endpoint).
+    let popularity: Int?
+    /// Recommendation score (optional, from recommend endpoint).
+    let score: Double?
 
     var artworkURL: URL? {
-        guard let urlString = artworkURLString else { return nil }
+        guard let urlString = imageUrl, !urlString.isEmpty else { return nil }
         return URL(string: urlString)
-    }
-
-    var previewURL: URL? {
-        guard let urlString = previewURLString else { return nil }
-        return URL(string: urlString)
-    }
-
-    var formattedDuration: String {
-        let minutes = durationInSeconds / 60
-        let seconds = durationInSeconds % 60
-        return String(format: "%d:%02d", minutes, seconds)
     }
 }

@@ -36,26 +36,22 @@ final class DIContainer {
     }
 
     /// Creates a container with real API-backed services for production.
+    /// Authentication tokens are provided by FirebaseAuthService and injected
+    /// into the APIClient, which attaches them to every request automatically.
     static func live() -> DIContainer {
-        let apiClient = APIClient()
-        let userId = UserDefaults.standard.string(forKey: "user_id") ?? {
-            let newId = UUID().uuidString
-            UserDefaults.standard.set(newId, forKey: "user_id")
-            return newId
-        }()
+        let authService = FirebaseAuthService()
+
+        // Create APIClient with Firebase token provider
+        // Every API request will automatically include the Authorization header
+        let apiClient = APIClient(authTokenProvider: {
+            try await authService.getIDToken()
+        })
 
         return DIContainer(
-            recommendationService: APIRecommendationService(
-                apiClient: apiClient,
-                userId: userId
-            ),
-            favoritesService: MockFavoritesService(), // TODO: Replace with API-backed version
-            feedbackService: APIFeedbackService(
-                apiClient: apiClient,
-                userId: userId
-            ),
-            authService: FirebaseAuthService()
+            recommendationService: APIRecommendationService(apiClient: apiClient),
+            favoritesService: APIFavoritesService(apiClient: apiClient),
+            feedbackService: APIFeedbackService(apiClient: apiClient),
+            authService: authService
         )
     }
 }
-

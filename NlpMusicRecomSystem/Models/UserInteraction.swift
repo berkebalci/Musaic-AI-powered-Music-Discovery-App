@@ -2,27 +2,28 @@
 //  UserInteraction.swift
 //  NlpMusicRecomSystem
 //
+//  Represents a user interaction (swipe) with a song.
+//  Simplified to match the new API structure where interactions
+//  are managed server-side via Firebase.
+//
 
 import Foundation
 
 struct UserInteraction: Identifiable, Codable {
     let id: String
-    let songId: String
-    let moodVector: MoodVector
-    let label: Int // 1 = Like, 0 = Dislike
+    let songId: Int
+    let action: String  // "like" or "dislike"
     let timestamp: Date
 
     init(
         id: String = UUID().uuidString,
-        songId: String,
-        moodVector: MoodVector,
-        label: Int,
+        songId: Int,
+        action: String,
         timestamp: Date = Date()
     ) {
         self.id = id
         self.songId = songId
-        self.moodVector = moodVector
-        self.label = label
+        self.action = action
         self.timestamp = timestamp
     }
 }

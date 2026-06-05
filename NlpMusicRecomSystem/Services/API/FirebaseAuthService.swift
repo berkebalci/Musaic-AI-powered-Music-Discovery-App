@@ -59,4 +59,13 @@ final class FirebaseAuthService: AuthServiceProtocol {
     func signOut() throws {
         try Auth.auth().signOut()
     }
+
+    /// Returns a fresh Firebase ID token for API authentication.
+    /// The token is automatically refreshed if expired.
+    func getIDToken() async throws -> String {
+        guard let user = Auth.auth().currentUser else {
+            throw APIError.authenticationRequired
+        }
+        return try await user.getIDToken()
+    }
 }
