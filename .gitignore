@@ -1,0 +1,4 @@
+# .gitignore dosyasının içi
+.env
+firebase-key.json
+__pycache__/
