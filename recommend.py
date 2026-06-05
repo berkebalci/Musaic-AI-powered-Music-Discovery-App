@@ -77,7 +77,10 @@ class RecommendationEngine:
         # 1. PyTorch Modelinden Temel Skorları Al
         scores = self._get_model_scores()
         
-        # 2. Geçmiş Profil (Like > 5 ise) veya Popülerlik (Cold Start) Çarpanı
+        # POPÜLERLİK VERİSİNİ EN BAŞTA HAZIRLIYORUZ (0.0 ile 1.0 arasında ölçekli)
+        popularity = self.df.get('popularity', pd.Series(np.zeros(len(self.df)))).values / 100.0
+        
+        # 2. Geçmiş Profil (Like > 5 ise) veya Başlangıç Durumu
         if len(liked_indices) >= 5:
             liked_idx = self.df[self.df['song_id'].isin(liked_indices)].index
             liked_vectors = self.X_scaled[liked_idx]
@@ -86,35 +89,39 @@ class RecommendationEngine:
             profile_similarity = self._calculate_similarity(user_profile)
             scores = 0.5 * scores + 0.5 * profile_similarity
         else:
-            popularity = self.df.get('popularity', pd.Series(np.zeros(len(self.df)))).values / 100.0
+            # Sadece soğuk başlangıçta değil, genel bir baz olarak popülerliği hafif katıyoruz
             scores = 0.7 * scores + 0.3 * popularity
             
-        # 3. Anlık Ruh Hali (Mood Vector) Çarpanı - %90 Güç
+        # 3. Anlık Ruh Hali (Mood Vector) Çarpanı
         if mood_vector is not None:
             mood_array = np.array(mood_vector)
             mood_similarity = self._calculate_similarity(mood_array)
-            scores = 0.1 * scores + 0.9 * mood_similarity
+            # Chat'in gücünü %90'dan %85'e çektik ki alttaki sisteme nefes payı kalsın
+            scores = 0.15 * scores + 0.85 * mood_similarity
             
-        # 4. Daha Önce Etkileşime Girilenleri (Like/Dislike) Filtrele
+        # 4. YENİ: POPÜLERLİK CİLASI (POPULARITY MULTIPLIER)
+        # Matematiksel uyumu bozmadan, popüler şarkılara %20'ye kadar "Kaldıraç" uyguluyoruz.
+        scores = scores * (1.0 + (popularity * 0.20))
+            
+        # 5. Daha Önce Etkileşime Girilenleri (Like/Dislike) Filtrele
         excluded = set(liked_indices + disliked_indices)
         result_df = self.df.copy()
         result_df['final_score'] = scores
         result_df = result_df[~result_df['song_id'].isin(excluded)]
         
-        # 5. En İyi N Şarkıyı Seç
+        # 6. En İyi N Şarkıyı Seç
         top_songs = result_df.nlargest(n, 'final_score')
         
-        # 6. iOS ve api.py İçin JSON Formatına Çevir
+        # 7. JSON Formatına Çevir
         feed = []
         for _, row in top_songs.iterrows():
-            # final_score bazen 1'in hafif üzerinde çıkabilir, 100 ile sınırlıyoruz (UX için)
+            # Popülerlik çarpanı skoru 1.0'ın üzerine taşıyabileceği için max 100 ile sınırlıyoruz
             match_percentage = min(100.0, round(float(row['final_score']) * 100, 1))
             
             feed.append({
                 "song_id": int(row['song_id']),
                 "track_name": str(row.get('track_name', row.get('name', 'Bilinmeyen Şarkı'))),
                 "artists": str(row.get('artists', row.get('artist', 'Bilinmeyen Sanatçı'))),
-                "image_url": str(row.get('image_url', '')),
                 "match_score": match_percentage
             })
             
