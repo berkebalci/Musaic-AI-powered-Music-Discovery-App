@@ -71,4 +71,19 @@ final class APIRecommendationService: RecommendationServiceProtocol {
 
         return RecommendationResult(songs: songs, moodVector: chatResponse.vector)
     }
+
+    /// Fetches song recommendations using a pre-computed mood vector.
+    /// Used by ChatViewModel after the chat endpoint produces a session vector.
+    func getRecommendations(for vector: [Double], count: Int = 5) async throws -> [Song] {
+        let requestBody = RecommendRequestDTO(moodVector: vector, n: count)
+        let response = try await apiClient.post(
+            url: APIEnvironment.recommendURL,
+            body: requestBody,
+            responseType: RecommendResponseDTO.self
+        )
+
+        return response.feed.enumerated().map { index, song in
+            song.toDomain(fallbackIndex: index)
+        }
+    }
 }

@@ -118,9 +118,17 @@ final class APIClient: APIClientProtocol {
     // MARK: - Auth Token
 
     private func attachAuthToken(to request: inout URLRequest) async throws {
-        guard let provider = authTokenProvider else { return }
-        let token = try await provider()
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        guard let provider = authTokenProvider else {
+            print("⚠️ [APIClient] No auth token provider configured")
+            return
+        }
+        do {
+            let token = try await provider()
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        } catch {
+            print("❌ [APIClient] Failed to get auth token: \(error)")
+            throw error
+        }
     }
 
     // MARK: - Core Request Execution
@@ -146,6 +154,10 @@ final class APIClient: APIClientProtocol {
 
         // Handle 401/403 as authentication errors
         if httpResponse.statusCode == 401 || httpResponse.statusCode == 403 {
+            let responseBody = String(data: data, encoding: .utf8) ?? "No body"
+            print("❌ [APIClient] Server rejected auth. Status: \(httpResponse.statusCode)")
+            print("❌ [APIClient] Response body: \(responseBody)")
+            print("❌ [APIClient] Request URL was: \(request.url?.absoluteString ?? "Unknown URL")")
             throw APIError.authenticationRequired
         }
 

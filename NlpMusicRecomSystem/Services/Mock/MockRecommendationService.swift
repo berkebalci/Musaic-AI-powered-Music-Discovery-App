@@ -36,4 +36,9 @@ final class MockRecommendationService: RecommendationServiceProtocol {
         let mockVector = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
         return RecommendationResult(songs: songs, moodVector: mockVector)
     }
+
+    func getRecommendations(for vector: [Double], count: Int) async throws -> [Song] {
+        try await Task.sleep(nanoseconds: 300_000_000)
+        return Array(mockCatalog.shuffled().prefix(count))
+    }
 }

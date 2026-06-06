@@ -16,6 +16,10 @@ struct DiscoveryContainerView: View {
 
             Group {
                 switch viewModel.state {
+                case .landing:
+                    DiscoveryLandingView(viewModel: viewModel, audioPlayer: audioPlayer)
+                        .transition(.opacity)
+
                 case .moodInput:
                     MoodInputView(viewModel: viewModel)
                         .transition(.asymmetric(

@@ -13,10 +13,11 @@ struct MainTabView: View {
 
     // MARK: - State
 
-    @State private var selectedTab: AppTab = .discovery
+    @State private var selectedTab: AppTab = .home
     @StateObject private var discoveryViewModel: DiscoveryViewModel
     @StateObject private var favoritesViewModel: FavoritesViewModel
     @StateObject private var audioPlayerViewModel: AudioPlayerViewModel
+    @StateObject private var chatViewModel: ChatViewModel
 
     // MARK: - Init
 
@@ -30,6 +31,10 @@ struct MainTabView: View {
             favoritesService: container.favoritesService
         ))
         _audioPlayerViewModel = StateObject(wrappedValue: AudioPlayerViewModel())
+        _chatViewModel = StateObject(wrappedValue: ChatViewModel(
+            chatService: container.chatService,
+            recommendationService: container.recommendationService
+        ))
     }
 
     // MARK: - Body
@@ -40,7 +45,7 @@ struct MainTabView: View {
             Group {
                 switch selectedTab {
                 case .home:
-                    HomeView()
+                    HomeView(chatViewModel: chatViewModel)
                 case .discovery:
                     DiscoveryContainerView(
                         viewModel: discoveryViewModel,
@@ -63,3 +68,4 @@ struct MainTabView: View {
         .ignoresSafeArea(.keyboard)
     }
 }
+

@@ -15,8 +15,15 @@ final class APIChatService: ChatServiceProtocol {
     }
 
     func sendMessage(_ message: String) async throws -> ChatResponseDTO {
-        let requestBody = ChatRequestDTO(message: message)
-        
+        try await sendMessage(message, sessionVector: Array(repeating: 0.5, count: 9))
+    }
+
+    func sendMessage(_ message: String, sessionVector: [Double]) async throws -> ChatResponseDTO {
+        let requestBody = ChatRequestDTO(
+            message: message,
+            currentSessionVector: sessionVector
+        )
+
         print("💬 /api/chat isteği başlatıldı. Mesaj: '\(message)'")
 
         let response = try await apiClient.post(
@@ -24,10 +31,11 @@ final class APIChatService: ChatServiceProtocol {
             body: requestBody,
             responseType: ChatResponseDTO.self
         )
-        
+
         print("✅ /api/chat başarılı! Sunucu cevabı: \(response.reply)")
         print("Vektör uzunluğu: \(response.vector.count)")
-        
+
         return response
     }
 }
+

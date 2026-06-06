@@ -62,10 +62,22 @@ final class FirebaseAuthService: AuthServiceProtocol {
 
     /// Returns a fresh Firebase ID token for API authentication.
     /// The token is automatically refreshed if expired.
+    /// Includes a brief retry to handle race conditions during auth state sync.
     func getIDToken() async throws -> String {
+        // If currentUser is nil, wait briefly for auth state to sync
+        // This handles the race condition where chat navigates before Firebase is ready
+        if Auth.auth().currentUser == nil {
+            print("⏳ Firebase currentUser nil — waiting for auth state sync...")
+            try await Task.sleep(nanoseconds: 500_000_000) // 0.5s
+        }
+
         guard let user = Auth.auth().currentUser else {
+            print("❌ Firebase currentUser is still nil after retry. User may not be signed in.")
             throw APIError.authenticationRequired
         }
-        return try await user.getIDToken()
+
+        let token = try await user.getIDToken()
+        print("🔑 Firebase ID Token alındı (ilk 20 karakter): \(String(token.prefix(20)))...")
+        return token
     }
 }

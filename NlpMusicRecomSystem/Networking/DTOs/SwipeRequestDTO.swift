@@ -44,6 +44,6 @@ struct BatchSwipeRequestDTO: Encodable {
 /// Response from `POST /api/swipe`.
 struct BatchSwipeResponseDTO: Decodable {
     let status: String
-    let newVector: [Double]
-    let message: String
+    let newProfileVector: [Double]
+    let likedCount: Int?
 }

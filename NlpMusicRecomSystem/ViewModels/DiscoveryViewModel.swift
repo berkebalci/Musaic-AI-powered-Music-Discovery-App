@@ -8,6 +8,7 @@ import SwiftUI
 import Combine
 
 enum DiscoveryState: Equatable {
+    case landing
     case moodInput
     case loading
     case swipeCards
@@ -20,7 +21,7 @@ final class DiscoveryViewModel: ObservableObject {
     // MARK: - Published State
 
     @Published var moodText: String = ""
-    @Published var state: DiscoveryState = .moodInput
+    @Published var state: DiscoveryState = .landing
     @Published var cards: [Song] = []
    
     var currentSong: Song? { cards.first }
@@ -45,8 +46,9 @@ final class DiscoveryViewModel: ObservableObject {
     private var likedSongs: [LikedSongItemDTO] = []
     /// Accumulates disliked song IDs during a swipe session.
     private var dislikedSongIds: [Int] = []
-    /// The current mood vector received from the chat endpoint.
-    private var currentMoodVector: [Double] = []
+    /// The persistent mood vector representing the user's music taste.
+    /// Initialized to a neutral 9D vector as per backend requirements.
+    private var currentMoodVector: [Double] = Array(repeating: 0.5, count: 9)
     /// Tracks whether a swipe submission is in progress.
     private var isSubmitting: Bool = false
 
@@ -115,9 +117,31 @@ final class DiscoveryViewModel: ObservableObject {
         removeTopCard()
     }
 
+    /// Fetches songs using the persistent mood vector (or default neutral).
+    /// Called from DiscoveryLandingView's "Start Discovering" button.
+    @MainActor
+    func fetchSongsWithDefaultMood() async {
+        state = .loading
+
+        // Reset swipe session for the new batch
+        likedSongs = []
+        dislikedSongIds = []
+
+        do {
+            let songs = try await recommendationService.getRecommendations(
+                for: currentMoodVector,
+                count: 15
+            )
+            cards = songs
+            state = songs.isEmpty ? .empty : .swipeCards
+        } catch {
+            state = .error(error.localizedDescription)
+        }
+    }
+
     @MainActor
     func goBackToMoodInput() {
-        state = .moodInput
+        state = .landing
         cards = []
         moodText = ""
         // Only clear session data if not currently submitting
