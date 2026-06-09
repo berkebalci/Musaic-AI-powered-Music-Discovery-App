@@ -26,3 +26,4 @@ Pods/
 
 # Secrets — DO NOT COMMIT
 **/Secrets.xcconfig
+**/AppleMusicToken.swift

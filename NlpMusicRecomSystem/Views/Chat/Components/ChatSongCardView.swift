@@ -13,7 +13,21 @@ struct ChatSongCardView: View {
     var body: some View {
         HStack(spacing: 12) {
             // Album art
-            AlbumArtPlaceholder(songId: song.id, size: 48, cornerRadius: 8)
+            if let artworkURL = song.artworkURL {
+                AsyncImage(url: artworkURL) { phase in
+                    if let image = phase.image {
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 48, height: 48)
+                            .cornerRadius(8)
+                    } else {
+                        AlbumArtPlaceholder(songId: song.id, size: 48, cornerRadius: 8)
+                    }
+                }
+            } else {
+                AlbumArtPlaceholder(songId: song.id, size: 48, cornerRadius: 8)
+            }
 
             // Song info
             VStack(alignment: .leading, spacing: 2) {
@@ -22,10 +36,21 @@ struct ChatSongCardView: View {
                     .foregroundColor(Theme.textPrimary)
                     .lineLimit(1)
 
-                Text(song.artistName)
-                    .font(.system(size: 13, weight: .regular))
-                    .foregroundColor(Theme.textSecondary)
-                    .lineLimit(1)
+                HStack(spacing: 4) {
+                    Text(song.artistName)
+                        .font(.system(size: 13, weight: .regular))
+                        .foregroundColor(Theme.textSecondary)
+                        .lineLimit(1)
+                    
+                    if let duration = song.durationString {
+                        Text("•")
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundColor(Theme.textSecondary)
+                        Text(duration)
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundColor(Theme.textSecondary)
+                    }
+                }
             }
 
             Spacer()

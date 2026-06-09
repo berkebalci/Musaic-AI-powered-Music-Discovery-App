@@ -4,5 +4,7 @@
 <dict>
 	<key>API_BASE_URL</key>
 	<string>$(API_BASE_URL)</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Musaic uygulamasında şarkıları aramak ve dinleyebilmek için Apple Music erişimine ihtiyaç duyulmaktadır.</string>
 </dict>
 </plist>

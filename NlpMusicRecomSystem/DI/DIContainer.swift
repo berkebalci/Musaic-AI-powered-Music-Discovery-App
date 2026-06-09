@@ -52,7 +52,7 @@ final class DIContainer {
         })
 
         return DIContainer(
-            recommendationService: APIRecommendationService(apiClient: apiClient),
+            recommendationService: APIRecommendationService(apiClient: apiClient, appleMusicService: AppleMusicService()),
             favoritesService: APIFavoritesService(apiClient: apiClient),
             feedbackService: APIFeedbackService(apiClient: apiClient),
             authService: authService,

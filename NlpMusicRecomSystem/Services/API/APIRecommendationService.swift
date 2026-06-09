@@ -12,9 +12,11 @@ import Foundation
 final class APIRecommendationService: RecommendationServiceProtocol {
 
     private let apiClient: APIClientProtocol
+    private let appleMusicService: AppleMusicServiceProtocol
 
-    init(apiClient: APIClientProtocol) {
+    init(apiClient: APIClientProtocol, appleMusicService: AppleMusicServiceProtocol) {
         self.apiClient = apiClient
+        self.appleMusicService = appleMusicService
     }
 
     /// Sends the mood text to the API and retrieves recommended songs.
@@ -65,11 +67,13 @@ final class APIRecommendationService: RecommendationServiceProtocol {
         }
         print("==============================================\n")
 
-        let songs = recommendResponse.feed.enumerated().map { index, song in
+        let initialSongs = recommendResponse.feed.enumerated().map { index, song in
             song.toDomain(fallbackIndex: index)
         }
+        
+        let enrichedSongs = await fetchAppleMusicData(for: initialSongs)
 
-        return RecommendationResult(songs: songs, moodVector: chatResponse.vector)
+        return RecommendationResult(songs: enrichedSongs, moodVector: chatResponse.vector)
     }
 
     /// Fetches song recommendations using a pre-computed mood vector.
@@ -82,8 +86,45 @@ final class APIRecommendationService: RecommendationServiceProtocol {
             responseType: RecommendResponseDTO.self
         )
 
-        return response.feed.enumerated().map { index, song in
+        let initialSongs = response.feed.enumerated().map { index, song in
             song.toDomain(fallbackIndex: index)
         }
+        
+        return await fetchAppleMusicData(for: initialSongs)
+    }
+    
+    // MARK: - Apple Music Enrichment
+    
+    private func fetchAppleMusicData(for songs: [Song]) async -> [Song] {
+        var enrichedSongs = songs
+        
+        print("\n🎵 [3. AŞAMA] Apple Music API'den metadata çekiliyor...")
+        
+        await withTaskGroup(of: (Int, MusicKit.Song?).self) { group in
+            for index in 0..<songs.count {
+                let song = songs[index]
+                group.addTask {
+                    let amSong = try? await self.appleMusicService.searchSong(title: song.title, artist: song.artistName)
+                    return (index, amSong)
+                }
+            }
+            
+            for await (index, amSong) in group {
+                if let amSong = amSong {
+                    enrichedSongs[index].appleMusicId = amSong.id.rawValue
+                    enrichedSongs[index].title = amSong.title
+                    enrichedSongs[index].artistName = amSong.artistName
+                    if let duration = amSong.duration {
+                        enrichedSongs[index].durationInMillis = Int(duration * 1000)
+                    }
+                    if let artworkUrl = amSong.artwork?.url(width: 600, height: 600) {
+                        enrichedSongs[index].imageUrl = artworkUrl.absoluteString
+                    }
+                }
+            }
+        }
+        
+        print("🟢 [3. AŞAMA BAŞARILI] Tüm şarkılar Apple Music metadatası ile güncellendi.")
+        return enrichedSongs
     }
 }

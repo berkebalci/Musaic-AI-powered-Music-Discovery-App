@@ -46,12 +46,51 @@ struct SwipeCardView: View {
     // MARK: - Card Content
 
     private var cardContent: some View {
-        VStack(spacing: 0) {
-            AlbumArtPlaceholder(songId: song.id, size: 260, cornerRadius: 16)
+        VStack(spacing: 16) {
+            if let artworkURL = song.artworkURL {
+                AsyncImage(url: artworkURL) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                            .frame(width: 260, height: 260)
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 260, height: 260)
+                            .cornerRadius(16)
+                    case .failure:
+                        AlbumArtPlaceholder(songId: song.id, size: 260, cornerRadius: 16)
+                    @unknown default:
+                        AlbumArtPlaceholder(songId: song.id, size: 260, cornerRadius: 16)
+                    }
+                }
                 .shadow(color: .black.opacity(0.3), radius: 12, y: 8)
+            } else {
+                AlbumArtPlaceholder(songId: song.id, size: 260, cornerRadius: 16)
+                    .shadow(color: .black.opacity(0.3), radius: 12, y: 8)
+            }
+            
+            VStack(spacing: 4) {
+                Text(song.title)
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundColor(Theme.textPrimary)
+                    .lineLimit(1)
+                
+                Text(song.artistName)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(Theme.textSecondary)
+                    .lineLimit(1)
+                
+                if let duration = song.durationString {
+                    Text(duration)
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundColor(Theme.textSecondary.opacity(0.8))
+                }
+            }
         }
         .padding(20)
-        .frame(width: 300, height: 340)
+        .frame(width: 300, height: 400)
         .background(
             RoundedRectangle(cornerRadius: Theme.cardCornerRadius)
                 .fill(.ultraThinMaterial)
@@ -90,7 +129,7 @@ struct SwipeCardView: View {
                     .padding(.leading, 40)
             }
         }
-        .frame(width: 300, height: 340)
+        .frame(width: 300, height: 400)
     }
 
     // MARK: - Drag Gesture
