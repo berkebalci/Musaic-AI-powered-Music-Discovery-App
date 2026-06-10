@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseCore
+import MusicKit
 
 @main
 struct NlpMusicRecomSystemApp: App {
@@ -25,6 +26,11 @@ struct NlpMusicRecomSystemApp: App {
         WindowGroup {
             RootView(container: container)
                 .preferredColorScheme(.dark)
+                .task {
+                    // Request Apple Music access on app launch
+                    let status = await MusicAuthorization.request()
+                    print("Apple Music Authorization Status: \\(status)")
+                }
         }
     }
 }

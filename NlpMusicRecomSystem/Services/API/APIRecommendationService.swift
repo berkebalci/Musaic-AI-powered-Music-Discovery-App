@@ -8,6 +8,7 @@
 //
 
 import Foundation
+import MusicKit
 
 final class APIRecommendationService: RecommendationServiceProtocol {
 
