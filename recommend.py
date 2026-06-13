@@ -39,11 +39,18 @@ class RecommendationEngine:
             return scores.numpy()
 
     def _calculate_similarity(self, target_vector):
-        similarities = np.dot(self.X_scaled, target_vector) / (
-            np.linalg.norm(self.X_scaled, axis=1) *
-            np.linalg.norm(target_vector) + 1e-8
-        )
-        return similarities
+        # 1. Hedef vektör ile tüm şarkılar arasındaki gerçek (mutlak) mesafeyi ölç
+        distances = np.linalg.norm(self.X_scaled - target_vector, axis=1)
+        
+        # 2. Maksimum mesafeyi bul (Bizde 9 özellik var, teorik max uzaklık: sqrt(9) = 3.0)
+        max_distance = np.sqrt(self.X_scaled.shape[1])
+        
+        # 3. Mesafeyi (0 - 3.0), benzerlik skoruna (1.0 - 0.0) çevir. 
+        # (Mesafe ne kadar azsa, benzerlik o kadar 1.0'a yaklaşır)
+        similarities = 1.0 - (distances / max_distance)
+        
+        # 4. Güvenlik önlemi olarak değerleri 0.0 ile 1.0 arasına sabitle
+        return np.clip(similarities, 0.0, 1.0)
 
     def update_batch_mood_vector(self, current_vector, liked_ids, disliked_ids, alpha=0.15, beta=0.05):
         """
@@ -109,8 +116,15 @@ class RecommendationEngine:
         result_df['final_score'] = scores
         result_df = result_df[~result_df['song_id'].isin(excluded)]
         
-        # 6. En İyi N Şarkıyı Seç
-        top_songs = result_df.nlargest(n, 'final_score')
+        # 6. YENİ: KEŞİF (EXPLORATION) VE AĞIRLIKLI ÇEKİLİŞ MANTIĞI
+        # Sadece en iyi N taneyi değil, en iyi 100 şarkılık elit bir havuz oluştur
+        top_pool = result_df.nlargest(100, 'final_score')
+        
+        # Havuzdan rastgele N (15) tane seç, ancak skoru/popülerliği yüksek olana torpil geç (weights)
+        top_songs = top_pool.sample(n=min(n, len(top_pool)), weights='final_score')
+        
+        # Seçilen şarkıları API'den UI'a düzgün gitmesi için büyükten küçüğe tekrar sırala
+        top_songs = top_songs.sort_values(by='final_score', ascending=False)
         
         # 7. JSON Formatına Çevir
         feed = []
