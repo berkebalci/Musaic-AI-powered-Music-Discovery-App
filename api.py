@@ -12,7 +12,6 @@ from firebase_admin import firestore
 from auth import verify_token
 from recommend import RecommendationEngine
 
-# Gizli şifreleri yükle
 load_dotenv()
 
 # --- GEMINI AYARLARI ---
@@ -39,7 +38,6 @@ app.add_middleware(
 )
 
 
-# ── SABİTLER ─────────────────────────────────────────────────────────────────
 
 # Cold start eşiği: bu sayıya eşit veya altındaki kullanıcılar yeni kullanıcıdır.
 COLD_START_THRESHOLD = 5
@@ -48,8 +46,6 @@ COLD_START_THRESHOLD = 5
 W_CHAT = 0.75
 W_PREVIOUS = 0.25
 
-
-# ── YARDIMCI FONKSİYONLAR ────────────────────────────────────────────────────
 
 def clamp_vector(v: List[float]) -> List[float]:
     """
@@ -76,7 +72,6 @@ def interpolate_vectors(
     expected_dim = 9
 
     # Boyut uyumsuzluğuna karşı güvenlik: her iki vektörü de 9 boyuta normalize et.
-    # Kısa vektörler 0.5 ile doldurulur, uzun vektörler kırpılır.
     def normalize_dim(v: List[float]) -> List[float]:
         if len(v) == expected_dim:
             return v
@@ -90,7 +85,7 @@ def interpolate_vectors(
         # Cold start — geçmiş session'a bakma, sadece Gemini çıktısını döndür.
         return clamp_vector(raw)
 
-    # Olgun kullanıcı — kümülatif evrilme uygula.
+    # Olgun kullanıcı 
     blended = [
         (raw[i] * W_CHAT) + (current[i] * W_PREVIOUS)
         for i in range(expected_dim)
@@ -98,7 +93,6 @@ def interpolate_vectors(
     return clamp_vector(blended)
 
 
-# ── VERİ MODELLERİ ───────────────────────────────────────────────────────────
 
 class ChatRequest(BaseModel):
     message: str
@@ -147,18 +141,8 @@ def health_check():
         "vector_owner": "iOS_local_storage",
     }
 
+# CHAT ENDPOINT 
 
-# ── 1. CHAT ENDPOINT (Stateless — Firestore okuma/yazma YOK) ─────────────────
-#
-# Çalışma prensibi:
-#   a) Gemini, kullanıcının mesajından 9 boyutlu raw_chat_vector üretir.
-#   b) iOS'tan gelen liked_count ile cold start / olgun kullanıcı belirlenir.
-#      → Firestore'a hiç sorgu atılmaz; iOS bu sayıyı lokalinde zaten biliyor.
-#   c) Harmanlama kuralına göre yeni session_vector hesaplanır.
-#   d) session_vector KESİNLİKLE Firestore'a yazılmaz; sadece iOS'a döndürülür.
-#      iOS bu vektörü lokalinde günceller ve bir sonraki chat mesajında
-#      current_session_vector olarak geri gönderir (kümülatif evrilme).
-#
 # Firestore maliyeti: SIFIR (gerçek anlamda Stateless).
 @app.post("/api/chat")
 def chat(request: ChatRequest, user_uid: str = Depends(verify_token)):
@@ -199,12 +183,11 @@ def chat(request: ChatRequest, user_uid: str = Depends(verify_token)):
     except Exception as e:
         print(f"  ✗ DEDEKTİF 3 (HATA): Gemini tarafında sorun çıktı (nötr vektör kullanılıyor): {e}")
 
-    # ── b) iOS'tan gelen liked_count ile kullanıcı tipini belirle ───────────
+    # iOS'tan gelen liked_count ile kullanıcı tipini belirle
     liked_count = request.liked_count
-    # NOT: COLD_START_THRESHOLD değişkeninin kodun üst kısımlarında tanımlı olduğunu varsayıyorum.
     print(f"  ✓ liked_count = {liked_count}")
 
-    # ── c) Harmanlama — kümülatif session_vector hesapla ────────────────────
+    # kümülatif session_vector hesapla 
     session_vector = interpolate_vectors(
         raw_chat_vector=raw_chat_vector,
         current_session_vector=request.current_session_vector,
@@ -213,22 +196,19 @@ def chat(request: ChatRequest, user_uid: str = Depends(verify_token)):
     print(f"  ✓ session_vector hesaplandı")
 
     print(" ⏱️ DEDEKTİF 4: Her şey tamam, iOS'a yanıt dönülüyor!")
-    # ── d) Sadece response dön — Firestore'a hiçbir şey yazılmaz ────────────
+    # Sadece response dön,Firestore'a hiçbir şey yazılmaz
     return {
         "reply": reply_text,
         "vector": session_vector,  # iOS bunu lokalinde saklar, bir sonraki çağrıda gönderir.
     }
 
-# ── 2. RECOMMEND ENDPOINT ─────────────────────────────────────────────────────
-#
-# userVectors'dan kalıcı profil vektörünü okur (1 read).
-# likedSongs subcollection'dan ID listesini çeker.
-# Motoru çalıştırarak öneri üretir.
+# RECOMMEND ENDPOINT 
+
 @app.post("/api/recommend")
 def get_custom_recommendations(request: RecommendRequest, user_uid: str = Depends(verify_token)):
     print(f"\n--- [2] RECOMMEND — Kullanıcı: {user_uid} ---")
 
-    # ── Kalıcı profil vektörünü oku: userVectors/{userId} → 1 read ──────────
+    #Kalıcı profil vektörünü oku: userVectors/{userId} → 1 read 
     vector_ref = db.collection('userVectors').document(user_uid)
     vector_doc = vector_ref.get()
 
@@ -239,44 +219,29 @@ def get_custom_recommendations(request: RecommendRequest, user_uid: str = Depend
     else:
         print(f"  ✓ Profil vektörü yok, iOS session vektörü kullanılıyor (fallback)")
 
-    # ── Beğenilen şarkı ID'lerini çek: subcollection stream ─────────────────
+    #Beğenilen şarkı ID'lerini çek: subcollection stream 
     liked_songs_ref = db.collection('users').document(user_uid).collection('likedSongs')
     liked_indices = [int(doc.id) for doc in liked_songs_ref.stream()]
     print(f"  ✓ {len(liked_indices)} beğenilen şarkı ID'si çekildi")
 
-    # ── Öneri motorunu çalıştır ──────────────────────────────────────────────
+    # Öneri motorunu çalıştır 
     result = engine.recommend(
         mood_vector=db_vector,
         liked_indices=liked_indices,
-        disliked_indices=[],  # dislike'lar sadece vektörü etkiler, burada gerekmez
+        disliked_indices=[], 
         n=request.n
     )
     return result
 
 
-# ── 3. SWIPE ENDPOINT (Batch Discovery & Profile Write) ──────────────────────
-#
-# Kullanıcı ister Discovery ister Chat modunda swipe etsin,
-# oturum bittiğinde tek seferinde çağrılır.
-#
-# İşlem akışı:
-#   a) liked_songs → likedSongs subcollection'a batch write (idempotent, ID = song_id).
-#   b) iOS'tan gelen current_mood_vector (kalıcı profil) + swipe aksiyonları
-#      → engine.update_batch_mood_vector → new_profile_vector.
-#      Fallback: profil yoksa (ilk oturum) current_mood_vector doğrudan kullanılır.
-#   c) new_profile_vector clamp + round uygulanır, kirli veri Firestore'a gitmez.
-#   d) new_profile_vector → userVectors/{user_uid} (1 write).
-#   e) new_profile_vector + güncel liked_count iOS'a döndürülür.
-#      iOS lokalini günceller; bir sonraki /api/chat çağrısında liked_count gönderir.
-#
-# Firestore maliyeti: N write (likedSongs) + 1 write (userVectors).
+#SWIPE ENDPOINT 
+
 @app.post("/api/swipe")
 def swipe_batch(request: BatchSwipeRequest, user_uid: str = Depends(verify_token)):
     print(f"\n--- [3] SWIPE — Kullanıcı: {user_uid} ---")
     print(f"  ✓ {len(request.liked_songs)} beğeni, {len(request.disliked_song_ids)} beğenmeme")
 
-    # ── a) Beğenilen şarkıları likedSongs subcollection'a batch write ────────
-    # Document ID = song_id → aynı şarkı tekrar beğenilse bile set() idempotent çalışır.
+    #Beğenilen şarkıları likedSongs subcollection'a batch write 
     if request.liked_songs:
         liked_songs_col = (
             db.collection('users')
@@ -298,7 +263,7 @@ def swipe_batch(request: BatchSwipeRequest, user_uid: str = Depends(verify_token
     else:
         print(f"  ✓ Beğenilen şarkı yok, likedSongs yazma atlandı")
 
-    # ── b) Kalıcı profil vektörünü swipe aksiyonlarına göre güncelle ─────────
+    # Kalıcı profil vektörünü swipe aksiyonlarına göre güncelle 
     liked_ids = [song.song_id for song in request.liked_songs]
 
     # Fallback: current_mood_vector boş veya geçersizse (ilk oturum) nötr vektör ata.
@@ -318,11 +283,10 @@ def swipe_batch(request: BatchSwipeRequest, user_uid: str = Depends(verify_token
         print(f"  ✗ update_batch_mood_vector hatası (mevcut vektör korunuyor): {e}")
         raw_profile_vector = current_vector
 
-    # ── c) Talimat gereği: clamp [0.0, 1.0] ve round(4) uygula ─────────────
     # Motordan 1.2 veya -0.1 gibi sınır dışı değer gelse bile Firestore'a temiz veri gider.
     new_profile_vector = clamp_vector(raw_profile_vector)
 
-    # ── d) Güncellenmiş kalıcı profili Firestore'a yaz: userVectors/{uid} ────
+    #Güncellenmiş kalıcı profili Firestore'a yaz: userVectors/{uid}
     vector_ref = db.collection('userVectors').document(user_uid)
     vector_ref.set({
         'vector':    new_profile_vector,
@@ -330,7 +294,7 @@ def swipe_batch(request: BatchSwipeRequest, user_uid: str = Depends(verify_token
     })
     print(f"  ✓ new_profile_vector userVectors'a yazıldı")
 
-    # ── e) iOS'a dön: profil vektörü + güncel liked_count ────────────────────
+    # iOS'a dön: profil vektörü + güncel liked_count 
     # iOS liked_count'u lokalinde günceller ve bir sonraki /api/chat çağrısında gönderir.
     # Böylece chat endpoint'i gerçek anlamda Stateless kalır.
     new_liked_count = request.liked_count + len(request.liked_songs)
@@ -342,11 +306,8 @@ def swipe_batch(request: BatchSwipeRequest, user_uid: str = Depends(verify_token
     }
 
 
-# ── 4. FAVORİLER ENDPOINT ────────────────────────────────────────────────────
-#
-# likedSongs subcollection'ını addedAt'e göre ters sırada döndürür.
-# Pagination: her çağrıda `limit` kadar şarkı gelir.
-# Bir sonraki sayfa için last_song_id query parametresi kullanılır.
+# FAVORİLER ENDPOINT 
+
 @app.get("/api/favorites")
 def get_favorites(
     user_uid: str = Depends(verify_token),
@@ -363,7 +324,7 @@ def get_favorites(
           .limit(limit)
     )
 
-    # Sayfalama: cursor olarak son dökümanı kullan.
+    # Sayfalama
     if last_song_id:
         last_doc = (
             db.collection('users')

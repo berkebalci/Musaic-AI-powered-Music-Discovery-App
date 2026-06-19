@@ -21,7 +21,9 @@ class MusicRecommendationModel(nn.Module):
             nn.ReLU(),
             nn.Linear(64, 1),
             nn.Sigmoid()  # 0-1 arası skor
+
         )
+    
     
     def forward(self, sarki_id, audio_features):
         # Şarkının gizli vektörü

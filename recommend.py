@@ -9,7 +9,6 @@ class RecommendationEngine:
         
         self.df = pd.read_csv('models/df_clean.csv')
         
-        # API'nin sorunsuz çalışması için song_id sütununu güvenceye alıyoruz
         if 'song_id' not in self.df.columns:
             self.df['song_id'] = self.df.index
             
@@ -28,6 +27,11 @@ class RecommendationEngine:
         ]
         
         print(f"Ready — {len(self.df)} songs loaded with Deep Learning engine.")
+        
+        print("Caching PyTorch base scores...")
+        self.cached_model_scores = self._get_model_scores()
+        print("Base scores cached successfully.")
+       
 
     def _get_model_scores(self):
         with torch.no_grad():
@@ -39,18 +43,21 @@ class RecommendationEngine:
             return scores.numpy()
 
     def _calculate_similarity(self, target_vector):
-        # 1. Hedef vektör ile tüm şarkılar arasındaki gerçek (mutlak) mesafeyi ölç
+       # 1. Hedef vektör ile tüm şarkılar arasındaki gerçek mesafeyi ölç
         distances = np.linalg.norm(self.X_scaled - target_vector, axis=1)
         
-        # 2. Maksimum mesafeyi bul (Bizde 9 özellik var, teorik max uzaklık: sqrt(9) = 3.0)
-        max_distance = np.sqrt(self.X_scaled.shape[1])
+        # DİNAMİK MİN-MAX ÖLÇEKLEME (Sabit bir üst sınır yerine veri setine göre esneme)
+        min_dist = distances.min()
+        max_dist = distances.max()
         
-        # 3. Mesafeyi (0 - 3.0), benzerlik skoruna (1.0 - 0.0) çevir. 
-        # (Mesafe ne kadar azsa, benzerlik o kadar 1.0'a yaklaşır)
-        similarities = 1.0 - (distances / max_distance)
+        # Eğer bir hata olur da tüm mesafeler aynı çıkarsa (Sıfıra bölünme hatasını engellemek için)
+        if max_dist == min_dist:
+            return np.ones_like(distances)
+            
+        # 3. En yakın şarkıyı 1.0 (%100), en uzak şarkıyı 0.0 (%0) olacak şekilde dağıt
+        similarities = 1.0 - ((distances - min_dist) / (max_dist - min_dist))
         
-        # 4. Güvenlik önlemi olarak değerleri 0.0 ile 1.0 arasına sabitle
-        return np.clip(similarities, 0.0, 1.0)
+        return similarities
 
     def update_batch_mood_vector(self, current_vector, liked_ids, disliked_ids, alpha=0.15, beta=0.05):
         """
@@ -81,10 +88,10 @@ class RecommendationEngine:
         return current.tolist()
 
     def recommend(self, mood_vector=None, liked_indices=[], disliked_indices=[], n=15):
-        # 1. PyTorch Modelinden Temel Skorları Al
-        scores = self._get_model_scores()
+        # 1. PyTorch Modelinden Temel Skorları Al (Artık her istekte hesaplamıyor, hafızadan çekiyor!)
+        scores = self.cached_model_scores.copy()
         
-        # POPÜLERLİK VERİSİNİ EN BAŞTA HAZIRLIYORUZ (0.0 ile 1.0 arasında ölçekli)
+        # POPÜLERLİK VERİSİ
         popularity = self.df.get('popularity', pd.Series(np.zeros(len(self.df)))).values / 100.0
         
         # 2. Geçmiş Profil (Like > 5 ise) veya Başlangıç Durumu
@@ -96,27 +103,31 @@ class RecommendationEngine:
             profile_similarity = self._calculate_similarity(user_profile)
             scores = 0.5 * scores + 0.5 * profile_similarity
         else:
-            # Sadece soğuk başlangıçta değil, genel bir baz olarak popülerliği hafif katıyoruz
             scores = 0.7 * scores + 0.3 * popularity
             
-        # 3. Anlık Ruh Hali (Mood Vector) Çarpanı
+        # Mood Vector Çarpanı
         if mood_vector is not None:
             mood_array = np.array(mood_vector)
             mood_similarity = self._calculate_similarity(mood_array)
-            # Chat'in gücünü %90'dan %85'e çektik ki alttaki sisteme nefes payı kalsın
+
             scores = 0.15 * scores + 0.85 * mood_similarity
+       
+        scores = scores * (1.0 + (popularity * 0.10))
             
-        # 4. YENİ: POPÜLERLİK CİLASI (POPULARITY MULTIPLIER)
-        # Matematiksel uyumu bozmadan, popüler şarkılara %20'ye kadar "Kaldıraç" uyguluyoruz.
-        scores = scores * (1.0 + (popularity * 0.20))
-            
-        # 5. Daha Önce Etkileşime Girilenleri (Like/Dislike) Filtrele
+        #Daha Önce Etkileşime Girilenleri (Like/Dislike) Filtrele
         excluded = set(liked_indices + disliked_indices)
         result_df = self.df.copy()
         result_df['final_score'] = scores
         result_df = result_df[~result_df['song_id'].isin(excluded)]
+
         
-        # 6. YENİ: KEŞİF (EXPLORATION) VE AĞIRLIKLI ÇEKİLİŞ MANTIĞI
+        # Filter songs with the exact same track name and artist (Single/Album duplicates)
+        track_name_col = 'track_name' if 'track_name' in result_df.columns else 'name'
+        artist_col = 'artists' if 'artists' in result_df.columns else 'artist'
+        
+        result_df = result_df.sort_values(by='final_score', ascending=False)
+        result_df = result_df.drop_duplicates(subset=[track_name_col, artist_col], keep='first')
+
         # Sadece en iyi N taneyi değil, en iyi 100 şarkılık elit bir havuz oluştur
         top_pool = result_df.nlargest(100, 'final_score')
         
