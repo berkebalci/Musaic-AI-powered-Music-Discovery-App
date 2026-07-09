@@ -8,6 +8,7 @@ import SwiftUI
 struct ChatBubbleView: View {
 
     let message: ChatMessage
+    @ObservedObject var audioPlayer: AudioPlayerViewModel
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
@@ -31,7 +32,7 @@ struct ChatBubbleView: View {
                         ScrollView(.vertical, showsIndicators: true) {
                             VStack(spacing: 8) {
                                 ForEach(message.suggestedSongs) { song in
-                                    ChatSongCardView(song: song)
+                                    ChatSongCardView(song: song, audioPlayer: audioPlayer)
                                 }
                             }
                             .padding(.vertical, 4)
@@ -59,15 +60,10 @@ struct ChatBubbleView: View {
     private var bubbleBackground: some View {
         if message.isFromUser {
             RoundedRectangle(cornerRadius: 16)
-                .fill(Theme.accentCyan.opacity(0.15))
+                .fill(Theme.primary.opacity(0.15))
         } else {
             RoundedRectangle(cornerRadius: 16)
-                .fill(.ultraThinMaterial)
-                .opacity(0.6)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Theme.cardGradient)
-                )
+                .fill(Theme.secondaryBg)
         }
     }
 
@@ -77,7 +73,7 @@ struct ChatBubbleView: View {
     private var bubbleOverlay: some View {
         if message.isFromUser {
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Theme.accentCyan.opacity(0.3), lineWidth: 1)
+                .stroke(Theme.primary.opacity(0.3), lineWidth: 1)
         } else {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Theme.cardBorder, lineWidth: 1)

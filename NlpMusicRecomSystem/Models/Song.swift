@@ -30,6 +30,8 @@ struct Song: Identifiable, Equatable {
     var appleMusicId: String?
     /// The duration of the track in milliseconds.
     var durationInMillis: Int?
+    /// 30-second preview URL from Apple Music.
+    var previewURL: URL?
     
     /// Formatted duration string (e.g., "3:23").
     var durationString: String? {

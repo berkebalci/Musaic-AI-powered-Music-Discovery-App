@@ -80,7 +80,7 @@ final class ChatViewModel: ObservableObject {
 
     func sendMessage() async {
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty else { return }
+        guard !text.isEmpty, !isAITyping else { return }
 
         // 1. Add user message
         let userMessage = ChatMessage.user(text)
@@ -91,6 +91,8 @@ final class ChatViewModel: ObservableObject {
         isAITyping = true
         let loadingMessage = ChatMessage.loading()
         messages.append(loadingMessage)
+
+        defer { isAITyping = false }
 
         do {
             // 3. Send to chat endpoint with current session vector
@@ -160,7 +162,7 @@ final class ChatViewModel: ObservableObject {
             print("❌ Chat error: \(error)")
         }
 
-        isAITyping = false
+        // isAITyping reset is handled by defer above
     }
 
     /// Resets the chat session entirely.

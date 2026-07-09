@@ -43,7 +43,8 @@ struct FavoriteSongDTO: Decodable {
             genre: "",
             imageUrl: albumArt,
             popularity: nil,
-            score: nil
+            score: nil,
+            appleMusicId: appleMusicId
         )
     }
 }

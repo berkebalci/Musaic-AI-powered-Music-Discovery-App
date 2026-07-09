@@ -13,20 +13,46 @@ struct SongRowView: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            // Album art
-            AlbumArtPlaceholder(songId: song.id, size: 56, cornerRadius: 10)
+            // Album art — show real artwork if available
+            if let artworkURL = song.artworkURL {
+                AsyncImage(url: artworkURL) { phase in
+                    if let image = phase.image {
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 56, height: 56)
+                            .cornerRadius(10)
+                    } else {
+                        AlbumArtPlaceholder(songId: song.id, size: 56, cornerRadius: 10)
+                    }
+                }
+                .frame(width: 56, height: 56)
+            } else {
+                AlbumArtPlaceholder(songId: song.id, size: 56, cornerRadius: 10)
+            }
 
             // Song info
             VStack(alignment: .leading, spacing: 3) {
                 Text(song.title)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(Theme.textPrimary)
+                    .foregroundColor(isPlaying ? Theme.accentCyan : Theme.textPrimary)
                     .lineLimit(1)
 
-                Text(song.artistName)
-                    .font(.system(size: 13))
-                    .foregroundColor(Theme.textSecondary)
-                    .lineLimit(1)
+                HStack(spacing: 4) {
+                    Text(song.artistName)
+                        .font(.system(size: 13))
+                        .foregroundColor(Theme.textSecondary)
+                        .lineLimit(1)
+
+                    if let duration = song.durationString {
+                        Text("•")
+                            .font(.system(size: 13))
+                            .foregroundColor(Theme.textSecondary)
+                        Text(duration)
+                            .font(.system(size: 13))
+                            .foregroundColor(Theme.textSecondary)
+                    }
+                }
             }
 
             Spacer()
@@ -46,5 +72,6 @@ struct SongRowView: View {
                 .fill(isPlaying ? Theme.cardSurfaceHover : Color.clear)
         )
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        .animation(.easeInOut(duration: 0.2), value: isPlaying)
     }
 }

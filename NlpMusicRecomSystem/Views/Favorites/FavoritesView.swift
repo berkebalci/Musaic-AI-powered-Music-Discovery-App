@@ -29,10 +29,22 @@ struct FavoritesView: View {
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
-                // Song list
-                if viewModel.filteredFavorites.isEmpty {
+                // Loading indicator
+                if viewModel.isLoading && viewModel.favorites.isEmpty {
+                    Spacer()
+                    ProgressView()
+                        .tint(Theme.primary)
+                        .scaleEffect(1.2)
+                    Text("Loading favorites...")
+                        .font(Theme.bodyFont)
+                        .foregroundColor(Theme.textSecondary)
+                        .padding(.top, 12)
+                    Spacer()
+                } else if viewModel.filteredFavorites.isEmpty {
+                    // Empty state
                     emptyState
                 } else {
+                    // Song list
                     songList
                 }
 
@@ -109,7 +121,7 @@ struct FavoritesView: View {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Theme.cardSurface)
+                .fill(Theme.secondaryBg)
         )
     }
 
@@ -122,7 +134,11 @@ struct FavoritesView: View {
                     SongRowView(
                         song: song,
                         isPlaying: audioPlayer.currentSong?.id == song.id && audioPlayer.isPlaying,
-                        onPlay: { audioPlayer.play(song: song) }
+                        onPlay: {
+                            Task {
+                                await viewModel.playSong(song, audioPlayer: audioPlayer)
+                            }
+                        }
                     )
                 }
             }

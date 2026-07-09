@@ -7,6 +7,7 @@ import SwiftUI
 
 struct ActionButtonsView: View {
 
+    let isPlaying: Bool
     let onDislike: () -> Void
     let onPlay: () -> Void
     let onLike: () -> Void
@@ -38,7 +39,7 @@ struct ActionButtonsView: View {
                         .stroke(Theme.accentCyan, lineWidth: 2.5)
                         .frame(width: 68, height: 68)
 
-                    Image(systemName: "play.fill")
+                    Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                         .font(.system(size: 26))
                         .foregroundColor(Theme.textPrimary)
                 }

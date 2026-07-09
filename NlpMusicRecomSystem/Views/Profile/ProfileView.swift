@@ -20,13 +20,13 @@ struct ProfileView: View {
                 // Avatar
                 ZStack {
                     Circle()
-                        .fill(Theme.accentCyan.opacity(0.12))
+                        .fill(Theme.primary.opacity(0.12))
                         .frame(width: 110, height: 110)
                     Image(systemName: "person.circle.fill")
                         .font(.system(size: 72))
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [Theme.accentCyan, Theme.accentPurple],
+                                colors: [Theme.primary, Theme.accentPurple],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
@@ -82,4 +82,3 @@ struct ProfileView: View {
         }
     }
 }
-

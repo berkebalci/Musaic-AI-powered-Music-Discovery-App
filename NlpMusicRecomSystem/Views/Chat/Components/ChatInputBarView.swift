@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-/// Glassmorphic input bar pinned at the bottom of the chat screen.
+/// Input bar pinned at the bottom of the chat screen.
 struct ChatInputBarView: View {
 
     @Binding var text: String
@@ -36,8 +36,8 @@ struct ChatInputBarView: View {
                     Circle()
                         .fill(
                             text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                            ? Theme.cardSurface
-                            : Theme.accentCyan
+                            ? Theme.tertiaryBg
+                            : Theme.primary
                         )
                         .frame(width: 36, height: 36)
 
@@ -46,7 +46,7 @@ struct ChatInputBarView: View {
                         .foregroundColor(
                             text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                             ? Theme.textTertiary
-                            : Theme.backgroundDark
+                            : .white
                         )
                 }
             }
@@ -61,22 +61,13 @@ struct ChatInputBarView: View {
 
     private var inputBarBackground: some View {
         RoundedRectangle(cornerRadius: 24)
-            .fill(.ultraThinMaterial)
-            .opacity(0.8)
-            .background(
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Theme.backgroundPrimary.opacity(0.9))
-            )
+            .fill(Theme.secondaryBg)
             .overlay(
                 RoundedRectangle(cornerRadius: 24)
                     .stroke(
-                        isFocused ? Theme.accentCyan.opacity(0.5) : Theme.cardBorder,
+                        isFocused ? Theme.primary.opacity(0.5) : Theme.cardBorder,
                         lineWidth: 1
                     )
-            )
-            .shadow(
-                color: isFocused ? Theme.accentCyan.opacity(0.2) : .clear,
-                radius: 8
             )
     }
 }

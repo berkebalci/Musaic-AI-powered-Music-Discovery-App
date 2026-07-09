@@ -8,18 +8,17 @@ import SwiftUI
 struct GradientBackground: View {
     var body: some View {
         ZStack {
-            Theme.backgroundGradient
+            Theme.background
                 .ignoresSafeArea()
 
-            // Subtle radial glow at top center
-            RadialGradient(
+            // Subtle tonal depth — no colored glows (DESIGN.md compliant)
+            LinearGradient(
                 colors: [
-                    Theme.accentCyan.opacity(0.08),
-                    Color.clear,
+                    Theme.background,
+                    Theme.backgroundPrimary,
                 ],
-                center: .top,
-                startRadius: 50,
-                endRadius: 400
+                startPoint: .top,
+                endPoint: .bottom
             )
             .ignoresSafeArea()
         }

@@ -5,11 +5,13 @@
 
 import SwiftUI
 
-/// Home tab view — contains the mood input UI (previously in Discovery)
+/// Chat tab view — contains the mood input UI
 /// and navigates to the AI mood chat screen.
 struct HomeView: View {
 
     @ObservedObject var chatViewModel: ChatViewModel
+    @ObservedObject var audioPlayer: AudioPlayerViewModel
+    @Binding var isChatActive: Bool
     @State private var moodText: String = ""
     @State private var showChat: Bool = false
     @FocusState private var isTextFieldFocused: Bool
@@ -65,8 +67,11 @@ struct HomeView: View {
                 .scrollDismissesKeyboard(.interactively)
             }
             .navigationDestination(isPresented: $showChat) {
-                MoodChatView(viewModel: chatViewModel)
+                MoodChatView(viewModel: chatViewModel, audioPlayer: audioPlayer)
             }
+        }
+        .onChange(of: showChat) { newValue in
+            isChatActive = newValue
         }
     }
 
@@ -76,11 +81,11 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("YOUR VIBE")
                 .font(.system(size: 11, weight: .bold))
-                .foregroundColor(Theme.accentCyan)
+                .foregroundColor(Theme.primary)
                 .tracking(1.5)
 
             Text("How are you feeling?")
-                .font(.system(size: 22, weight: .semibold, design: .rounded))
+                .font(.system(size: 22, weight: .semibold))
                 .foregroundColor(Theme.textPrimary)
 
             Spacer()
@@ -110,7 +115,7 @@ struct HomeView: View {
                         .foregroundColor(
                             moodText.isEmpty
                             ? Theme.textTertiary
-                            : Theme.accentCyan
+                            : Theme.primary
                         )
                         .frame(width: 36, height: 36)
                 }
@@ -125,12 +130,7 @@ struct HomeView: View {
         .padding(24)
         .background(
             RoundedRectangle(cornerRadius: Theme.cardCornerRadius)
-                .fill(.ultraThinMaterial)
-                .opacity(0.4)
-        )
-        .background(
-            RoundedRectangle(cornerRadius: Theme.cardCornerRadius)
-                .fill(Theme.cardSurface)
+                .fill(Theme.secondaryBg)
         )
         .overlay(
             RoundedRectangle(cornerRadius: Theme.cardCornerRadius)

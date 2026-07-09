@@ -55,11 +55,11 @@ struct MoodInputView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("YOUR VIBE")
                 .font(.system(size: 11, weight: .bold))
-                .foregroundColor(Theme.accentCyan)
+                .foregroundColor(Theme.primary)
                 .tracking(1.5)
 
             Text("How are you feeling?")
-                .font(.system(size: 22, weight: .semibold, design: .rounded))
+                .font(.system(size: 22, weight: .semibold))
                 .foregroundColor(Theme.textPrimary)
 
             Spacer()
@@ -89,7 +89,7 @@ struct MoodInputView: View {
                         .foregroundColor(
                             viewModel.moodText.isEmpty
                             ? Theme.textTertiary
-                            : Theme.accentCyan
+                            : Theme.primary
                         )
                         .frame(width: 36, height: 36)
                 }
@@ -104,12 +104,7 @@ struct MoodInputView: View {
         .padding(24)
         .background(
             RoundedRectangle(cornerRadius: Theme.cardCornerRadius)
-                .fill(.ultraThinMaterial)
-                .opacity(0.4)
-        )
-        .background(
-            RoundedRectangle(cornerRadius: Theme.cardCornerRadius)
-                .fill(Theme.cardSurface)
+                .fill(Theme.secondaryBg)
         )
         .overlay(
             RoundedRectangle(cornerRadius: Theme.cardCornerRadius)

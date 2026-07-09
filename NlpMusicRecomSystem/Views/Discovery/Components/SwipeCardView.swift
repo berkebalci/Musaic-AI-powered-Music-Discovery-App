@@ -94,11 +94,14 @@ struct SwipeCardView: View {
         .background(
             RoundedRectangle(cornerRadius: Theme.cardCornerRadius)
                 .fill(.ultraThinMaterial)
-                .opacity(0.5)
         )
         .background(
             RoundedRectangle(cornerRadius: Theme.cardCornerRadius)
                 .fill(Theme.cardGradient)
+        )
+        .background(
+            RoundedRectangle(cornerRadius: Theme.cardCornerRadius)
+                .fill(Theme.backgroundPrimary)
         )
         .overlay(
             RoundedRectangle(cornerRadius: Theme.cardCornerRadius)

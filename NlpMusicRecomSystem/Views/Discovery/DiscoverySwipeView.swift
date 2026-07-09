@@ -44,14 +44,21 @@ struct DiscoverySwipeView: View {
             // Action buttons
             if let song = viewModel.currentSong {
                 ActionButtonsView(
+                    isPlaying: audioPlayer.currentSong?.id == song.id && audioPlayer.isPlaying,
                     onDislike: {
-                        Task { await viewModel.swipeLeft(on: song) }
+                        Task {
+                            //audioPlayer.stop()
+                            await viewModel.swipeLeft(on: song)
+                           }
                     },
                     onPlay: {
                         audioPlayer.play(song: song)
                     },
                     onLike: {
-                        Task { await viewModel.swipeRight(on: song) }
+                        Task {
+                            //audioPlayer.stop()
+                            await viewModel.swipeRight(on: song)
+                            }
                     }
                 )
             }
@@ -68,37 +75,19 @@ struct DiscoverySwipeView: View {
             Button {
                 viewModel.goBackToMoodInput()
             } label: {
-                ZStack {
-                    Circle()
-                        .fill(Theme.cardSurface)
-                        .frame(width: 40, height: 40)
-
-                    Image(systemName: "person.fill")
-                        .font(.system(size: 16))
-                        .foregroundColor(Theme.textSecondary)
-                }
+                ZStack {}
             }
 
             Spacer()
 
             // Mood indicator
             Capsule()
-                .fill(Theme.accentCyan.opacity(0.6))
+                
                 .frame(width: 40, height: 4)
 
             Spacer()
 
-            Button {} label: {
-                ZStack {
-                    Circle()
-                        .fill(Theme.cardSurface)
-                        .frame(width: 40, height: 40)
-
-                    Image(systemName: "bell.fill")
-                        .font(.system(size: 16))
-                        .foregroundColor(Theme.textSecondary)
-                }
-            }
+           
         }
     }
 

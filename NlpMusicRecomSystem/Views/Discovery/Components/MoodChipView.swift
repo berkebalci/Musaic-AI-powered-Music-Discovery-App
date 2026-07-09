@@ -15,16 +15,16 @@ struct MoodChipView: View {
         Button(action: action) {
             Text(title)
                 .font(Theme.chipFont)
-                .foregroundColor(Theme.accentCyan)
+                .foregroundColor(Theme.primary)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
                 .background(
                     Capsule()
-                        .fill(Theme.accentCyan.opacity(isPressed ? 0.15 : 0.08))
+                        .fill(Theme.primary.opacity(isPressed ? 0.15 : 0.08))
                 )
                 .overlay(
                     Capsule()
-                        .stroke(Theme.accentCyan.opacity(0.3), lineWidth: 1)
+                        .stroke(Theme.primary.opacity(0.3), lineWidth: 1)
                 )
         }
         .buttonStyle(ScaleButtonStyle())
@@ -36,7 +36,7 @@ struct MoodChipView: View {
 struct ScaleButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
     }
 }

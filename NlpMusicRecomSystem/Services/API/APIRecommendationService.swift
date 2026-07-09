@@ -121,6 +121,9 @@ final class APIRecommendationService: RecommendationServiceProtocol {
                     if let artworkUrl = amSong.artwork?.url(width: 600, height: 600) {
                         enrichedSongs[index].imageUrl = artworkUrl.absoluteString
                     }
+                    if let previewUrl = amSong.previewAssets?.first?.url {
+                        enrichedSongs[index].previewURL = previewUrl
+                    }
                 }
             }
         }

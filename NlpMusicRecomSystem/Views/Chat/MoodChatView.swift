@@ -5,11 +5,12 @@
 
 import SwiftUI
 
-/// The AI mood chat screen — a glassmorphic conversational interface
+/// The AI mood chat screen — a conversational interface
 /// where the user describes their mood and receives song recommendations.
 struct MoodChatView: View {
 
     @ObservedObject var viewModel: ChatViewModel
+    @ObservedObject var audioPlayer: AudioPlayerViewModel
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -26,7 +27,7 @@ struct MoodChatView: View {
                                 .frame(height: 16)
 
                             ForEach(viewModel.messages) { message in
-                                ChatBubbleView(message: message)
+                                ChatBubbleView(message: message, audioPlayer: audioPlayer)
                                     .id(message.id)
 
                                 // Show mood presets after the first AI greeting
@@ -42,7 +43,7 @@ struct MoodChatView: View {
                                 HStack {
                                     Text(status)
                                         .font(.system(size: 14, weight: .medium))
-                                        .foregroundColor(Theme.accentCyan)
+                                        .foregroundColor(Theme.primary)
                                         .italic()
                                     Spacer()
                                 }
@@ -51,8 +52,9 @@ struct MoodChatView: View {
                                 .transition(.opacity)
                             }
 
+                            // Extra space at bottom so content doesn't hide behind mini player
                             Spacer()
-                                .frame(height: 16)
+                                .frame(height: audioPlayer.currentSong != nil ? 80 : 16)
                         }
                     }
                     .scrollDismissesKeyboard(.interactively)
@@ -63,6 +65,14 @@ struct MoodChatView: View {
                             }
                         }
                     }
+                }
+
+                // Mini Player (above input bar)
+                if audioPlayer.currentSong != nil {
+                    MiniPlayerView(audioPlayer: audioPlayer)
+                        .padding(.horizontal, 12)
+                        .padding(.bottom, 4)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
 
                 // Input bar
@@ -77,6 +87,7 @@ struct MoodChatView: View {
                 .padding(.bottom, 8)
             }
         }
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: audioPlayer.currentSong != nil)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -85,7 +96,7 @@ struct MoodChatView: View {
                 } label: {
                     ZStack {
                         Circle()
-                            .fill(Theme.cardSurface)
+                            .fill(Theme.secondaryBg)
                             .frame(width: 36, height: 36)
 
                         Image(systemName: "chevron.left")
@@ -110,26 +121,16 @@ struct MoodChatView: View {
 
     private var chatBackground: some View {
         ZStack {
+            Theme.background
+                .ignoresSafeArea()
+
             LinearGradient(
                 colors: [
-                    Color(hex: "#070E1A"),
-                    Color(hex: "#0A1628"),
-                    Color(hex: "#0F2030"),
+                    Theme.background,
+                    Theme.backgroundPrimary,
                 ],
                 startPoint: .top,
                 endPoint: .bottom
-            )
-            .ignoresSafeArea()
-
-            // Subtle radial glow
-            RadialGradient(
-                colors: [
-                    Theme.accentCyan.opacity(0.05),
-                    Color.clear,
-                ],
-                center: .top,
-                startRadius: 80,
-                endRadius: 500
             )
             .ignoresSafeArea()
         }

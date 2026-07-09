@@ -23,8 +23,12 @@ final class DiscoveryViewModel: ObservableObject {
     @Published var moodText: String = ""
     @Published var state: DiscoveryState = .landing
     @Published var cards: [Song] = []
-   
+    
     var currentSong: Song? { cards.first }
+    var currentIndex: Int {
+        guard let currentSong = currentSong else { return 0 }
+        return cards.firstIndex(of: currentSong) ?? 0
+    }
     var visibleCards: [Song] { Array(cards.prefix(3)) }
 
     let moodPresets = [
@@ -39,6 +43,7 @@ final class DiscoveryViewModel: ObservableObject {
 
     private let recommendationService: any RecommendationServiceProtocol
     private let feedbackService: any FeedbackServiceProtocol
+    private let audioplayer: AudioPlayerViewModel
 
     // MARK: - Swipe Session State
 
@@ -56,10 +61,12 @@ final class DiscoveryViewModel: ObservableObject {
 
     init(
         recommendationService: any RecommendationServiceProtocol,
-        feedbackService: any FeedbackServiceProtocol
+        feedbackService: any FeedbackServiceProtocol,
+        audioPlayer: AudioPlayerViewModel
     ) {
         self.recommendationService = recommendationService
         self.feedbackService = feedbackService
+        self.audioplayer = audioPlayer
     }
 
     // MARK: - User Intents
@@ -87,6 +94,10 @@ final class DiscoveryViewModel: ObservableObject {
             currentMoodVector = result.moodVector
 
             state = result.songs.isEmpty ? .empty : .swipeCards
+            
+            if let firstSong = result.songs.first {
+                audioplayer.play(song: firstSong)
+            }
         } catch {
             state = .error(error.localizedDescription)
         }
@@ -102,21 +113,34 @@ final class DiscoveryViewModel: ObservableObject {
             title: song.title,
             artist: song.artistName,
             albumArt: song.imageUrl ?? "",
-            appleMusicId: ""
+            appleMusicId: song.appleMusicId ?? ""
         )
         likedSongs.append(likedItem)
-
+        
         removeTopCard()
+        
+        if let nextSong = currentSong {
+            audioplayer.play(song: nextSong)
+        } else {
+            audioplayer.stop()
+        }
     }
 
     @MainActor
     func swipeLeft(on song: Song) async {
         // Accumulate the disliked song ID
         dislikedSongIds.append(song.id)
-
+            
         removeTopCard()
+        
+        if let nextSong = currentSong {
+            audioplayer.play(song: nextSong)
+        } else {
+            audioplayer.stop()
+        }
     }
-
+    
+    
     /// Fetches songs using the persistent mood vector (or default neutral).
     /// Called from DiscoveryLandingView's "Start Discovering" button.
     @MainActor
@@ -134,6 +158,10 @@ final class DiscoveryViewModel: ObservableObject {
             )
             cards = songs
             state = songs.isEmpty ? .empty : .swipeCards
+            
+            if let firstSong = songs.first {
+                audioplayer.play(song: firstSong)
+            }
         } catch {
             state = .error(error.localizedDescription)
         }
@@ -144,6 +172,7 @@ final class DiscoveryViewModel: ObservableObject {
         state = .landing
         cards = []
         moodText = ""
+        audioplayer.stop()
         // Only clear session data if not currently submitting
         if !isSubmitting {
             likedSongs = []

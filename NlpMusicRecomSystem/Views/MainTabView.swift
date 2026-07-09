@@ -14,6 +14,7 @@ struct MainTabView: View {
     // MARK: - State
 
     @State private var selectedTab: AppTab = .home
+    @State private var isChatActive: Bool = false
     @StateObject private var discoveryViewModel: DiscoveryViewModel
     @StateObject private var favoritesViewModel: FavoritesViewModel
     @StateObject private var audioPlayerViewModel: AudioPlayerViewModel
@@ -23,18 +24,24 @@ struct MainTabView: View {
 
     init(container: DIContainer) {
         self.container = container
-        _discoveryViewModel = StateObject(wrappedValue: DiscoveryViewModel(
-            recommendationService: container.recommendationService,
-            feedbackService: container.feedbackService
-        ))
-        _favoritesViewModel = StateObject(wrappedValue: FavoritesViewModel(
-            favoritesService: container.favoritesService
-        ))
-        _audioPlayerViewModel = StateObject(wrappedValue: AudioPlayerViewModel())
+        let player = AudioPlayerViewModel()
+            _audioPlayerViewModel = StateObject(wrappedValue: player)
         _chatViewModel = StateObject(wrappedValue: ChatViewModel(
             chatService: container.chatService,
             recommendationService: container.recommendationService
         ))
+        
+        _discoveryViewModel = StateObject(wrappedValue: DiscoveryViewModel(
+            recommendationService: container.recommendationService,
+            feedbackService: container.feedbackService,
+            audioPlayer: player
+            
+        ))
+        _favoritesViewModel = StateObject(wrappedValue: FavoritesViewModel(
+            favoritesService: container.favoritesService,
+            appleMusicService: AppleMusicService()
+        ))
+        
     }
 
     // MARK: - Body
@@ -45,7 +52,17 @@ struct MainTabView: View {
             Group {
                 switch selectedTab {
                 case .home:
-                    HomeView(chatViewModel: chatViewModel)
+                    LandingHomeView(
+                        selectedTab: $selectedTab,
+                        recommendationService: container.recommendationService,
+                        audioPlayer: audioPlayerViewModel
+                    )
+                case .chat:
+                    HomeView(
+                        chatViewModel: chatViewModel,
+                        audioPlayer: audioPlayerViewModel,
+                        isChatActive: $isChatActive
+                    )
                 case .discovery:
                     DiscoveryContainerView(
                         viewModel: discoveryViewModel,
@@ -62,10 +79,13 @@ struct MainTabView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            // Custom Tab Bar
-            CustomTabBar(selectedTab: $selectedTab)
+            // Custom Tab Bar — hidden when chat is active
+            if !isChatActive {
+                CustomTabBar(selectedTab: $selectedTab)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
+        .animation(.easeInOut(duration: 0.25), value: isChatActive)
         .ignoresSafeArea(.keyboard)
     }
 }
-

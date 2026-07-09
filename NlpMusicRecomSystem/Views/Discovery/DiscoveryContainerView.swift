@@ -59,7 +59,7 @@ struct DiscoveryContainerView: View {
 
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 56))
-                .foregroundStyle(Theme.accentCyan)
+                .foregroundStyle(Theme.primary)
 
             Text("All caught up!")
                 .font(Theme.titleFont)
@@ -75,10 +75,10 @@ struct DiscoveryContainerView: View {
             } label: {
                 Text("New Mood")
                     .font(Theme.captionFont)
-                    .foregroundColor(Theme.backgroundDark)
+                    .foregroundColor(.white)
                     .padding(.horizontal, 32)
                     .padding(.vertical, 14)
-                    .background(Theme.accentCyan)
+                    .background(Theme.primary)
                     .clipShape(Capsule())
             }
             .padding(.top, 8)
@@ -113,10 +113,10 @@ struct DiscoveryContainerView: View {
             } label: {
                 Text("Try Again")
                     .font(Theme.captionFont)
-                    .foregroundColor(Theme.backgroundDark)
+                    .foregroundColor(.white)
                     .padding(.horizontal, 32)
                     .padding(.vertical, 14)
-                    .background(Theme.accentCyan)
+                    .background(Theme.primary)
                     .clipShape(Capsule())
             }
 

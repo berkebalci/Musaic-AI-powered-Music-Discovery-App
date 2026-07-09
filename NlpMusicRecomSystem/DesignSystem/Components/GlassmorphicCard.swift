@@ -1,4 +1,4 @@
-//
+ //
 //  GlassmorphicCard.swift
 //  NlpMusicRecomSystem
 //
@@ -16,12 +16,7 @@ struct GlassmorphicCard<Content: View>: View {
         content
             .background(
                 RoundedRectangle(cornerRadius: Theme.cardCornerRadius)
-                    .fill(.ultraThinMaterial)
-                    .opacity(0.6)
-            )
-            .background(
-                RoundedRectangle(cornerRadius: Theme.cardCornerRadius)
-                    .fill(Theme.cardGradient)
+                    .fill(Theme.secondaryBg)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.cardCornerRadius)

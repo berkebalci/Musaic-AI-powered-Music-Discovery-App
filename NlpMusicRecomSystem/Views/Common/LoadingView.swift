@@ -19,7 +19,7 @@ struct LoadingView: View {
                     // Pulsing rings
                     ForEach(0..<3, id: \.self) { index in
                         Circle()
-                            .stroke(Theme.accentCyan.opacity(0.2 - Double(index) * 0.05), lineWidth: 2)
+                            .stroke(Theme.primary.opacity(0.2 - Double(index) * 0.05), lineWidth: 2)
                             .frame(width: CGFloat(80 + index * 30), height: CGFloat(80 + index * 30))
                             .scaleEffect(isAnimating ? 1.2 : 0.8)
                             .opacity(isAnimating ? 0.0 : 0.6)
@@ -34,9 +34,8 @@ struct LoadingView: View {
                     // Center icon
                     Image(systemName: "waveform.circle.fill")
                         .font(.system(size: 48))
-                        .foregroundStyle(Theme.accentCyan)
+                        .foregroundStyle(Theme.primary)
                         .scaleEffect(pulseScale)
-                        .shadow(color: Theme.accentCyan.opacity(0.4), radius: 16)
                 }
 
                 VStack(spacing: 8) {

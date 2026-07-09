@@ -12,7 +12,7 @@ struct AnimatedSparkle: View {
         ZStack {
             // Central glow
             Circle()
-                .fill(Theme.accentCyan.opacity(0.15))
+                .fill(Theme.primary.opacity(0.15))
                 .frame(width: 80, height: 80)
                 .blur(radius: 20)
                 .scaleEffect(isAnimating ? 1.2 : 0.9)
@@ -22,13 +22,13 @@ struct AnimatedSparkle: View {
                 .font(.system(size: 44, weight: .medium))
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [Theme.accentCyan, Theme.accentCyan.opacity(0.6)],
+                        colors: [Theme.primary, Theme.accentPurple],
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
                 .scaleEffect(isAnimating ? 1.05 : 0.95)
-                .shadow(color: Theme.accentCyan.opacity(0.5), radius: 12, x: 0, y: 4)
+                .shadow(color: Theme.primary.opacity(0.3), radius: 8, x: 0, y: 4)
         }
         .onAppear {
             withAnimation(

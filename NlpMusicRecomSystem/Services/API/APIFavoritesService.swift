@@ -24,7 +24,9 @@ final class APIFavoritesService: FavoritesServiceProtocol {
             url: APIEnvironment.favoritesURL,
             responseType: FavoritesResponseDTO.self
         )
-
-        return response.favorites.map { $0.toDomain() }
+        let a = response.favorites.map { $0.toDomain() }
+        print("burasi favori servis class'i")
+        print(a)
+        return a
     }
 }

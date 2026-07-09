@@ -2,62 +2,75 @@
 //  Theme.swift
 //  NlpMusicRecomSystem
 //
+//  Design system aligned with DESIGN.md (HIG-compliant, iOS-native).
+//
 
 import SwiftUI
 
 enum Theme {
 
-    // MARK: - Background Colors
+    // MARK: - Core Colors (DESIGN.md Aligned)
 
-    static let backgroundDark = Color(hex: "#070E1A")
-    static let backgroundPrimary = Color(hex: "#0A1628")
-    static let backgroundMid = Color(hex: "#0F2030")
-    static let backgroundLight = Color(hex: "#162D40")
+    /// Primary accent — Vibrant Indigo for core actions and active states.
+    static let primary = Color(hex: "#5856D6")
+    /// Pure black background — OLED optimized.
+    static let background = Color(hex: "#000000")
+    /// Secondary background — Cards, list rows, inputs.
+    static let secondaryBg = Color(hex: "#1C1C1E")
+    /// Tertiary background — Selected rows, elevated surfaces.
+    static let tertiaryBg = Color(hex: "#2C2C2E")
+
+    // MARK: - Legacy Aliases (backward compatibility)
+
+    static let backgroundDark = background
+    static let backgroundPrimary = Color(hex: "#131315")
+    static let backgroundMid = secondaryBg
+    static let backgroundLight = tertiaryBg
 
     // MARK: - Accent Colors
 
-    static let accentCyan = Color(hex: "#00D4FF")
-    static let accentTeal = Color(hex: "#1A8A8A")
-    static let accentPurple = Color(hex: "#7B61FF")
-    static let accentPink = Color(hex: "#FF6B9D")
+    static let accentCyan = primary              // Mapped to Indigo
+    static let accentTeal = Color(hex: "#4B8EFF") // primary-container
+    static let accentPurple = Color(hex: "#C2C1FF") // secondary
+    static let accentPink = Color(hex: "#FFB595")   // tertiary
 
     // MARK: - Surface Colors
 
-    static let cardSurface = Color.white.opacity(0.07)
-    static let cardBorder = Color.white.opacity(0.12)
-    static let cardSurfaceHover = Color.white.opacity(0.12)
+    static let cardSurface = secondaryBg
+    static let cardBorder = Color.white.opacity(0.10)
+    static let cardSurfaceHover = tertiaryBg
 
     // MARK: - Text Colors
 
     static let textPrimary = Color.white
-    static let textSecondary = Color.white.opacity(0.6)
+    static let textSecondary = Color.gray
     static let textTertiary = Color.white.opacity(0.35)
 
     // MARK: - Tab Bar
 
-    static let tabBarBackground = Color(hex: "#0B1420").opacity(0.95)
-    static let tabBarActive = accentCyan
+    static let tabBarBackground = Color.black.opacity(0.95)
+    static let tabBarActive = primary
     static let tabBarInactive = Color.white.opacity(0.4)
 
     // MARK: - Gradients
 
     static let backgroundGradient = LinearGradient(
-        colors: [backgroundDark, backgroundPrimary, backgroundMid],
+        colors: [background, backgroundPrimary, secondaryBg.opacity(0.5)],
         startPoint: .top,
         endPoint: .bottom
     )
 
     static let cardGradient = LinearGradient(
         colors: [
-            Color.white.opacity(0.1),
-            Color.white.opacity(0.04),
+            Color.white.opacity(0.06),
+            Color.white.opacity(0.02),
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
     static let accentGradient = LinearGradient(
-        colors: [accentCyan, accentTeal],
+        colors: [primary, accentTeal],
         startPoint: .leading,
         endPoint: .trailing
     )
@@ -80,18 +93,29 @@ enum Theme {
         return albumGradients[hash]
     }
 
-    // MARK: - Typography
+    // MARK: - Typography (HIG-aligned)
 
-    static let titleFont = Font.system(size: 28, weight: .bold, design: .rounded)
-    static let headlineFont = Font.system(size: 20, weight: .semibold, design: .rounded)
-    static let bodyFont = Font.system(size: 16, weight: .regular)
-    static let captionFont = Font.system(size: 13, weight: .medium)
+    /// 34pt Bold — Screen entry points, primary headers.
+    static let largeTitleFont = Font.system(size: 34, weight: .bold)
+    /// 28pt Bold — Section headers.
+    static let titleFont = Font.system(size: 28, weight: .bold)
+    /// 17pt Semibold — Card titles, section headers.
+    static let headlineFont = Font.system(size: 17, weight: .semibold)
+    /// 17pt Regular — Body text.
+    static let bodyFont = Font.system(size: 17, weight: .regular)
+    /// 16pt Regular — Callout text.
+    static let calloutFont = Font.system(size: 16, weight: .regular)
+    /// 15pt Regular — Subheadline.
+    static let subheadlineFont = Font.system(size: 15, weight: .regular)
+    /// 13pt Regular — Footnote, metadata, timestamps.
+    static let captionFont = Font.system(size: 13, weight: .regular)
+    /// 13pt Medium — Chips, small labels.
     static let chipFont = Font.system(size: 13, weight: .medium)
 
     // MARK: - Dimensions
 
-    static let cornerRadius: CGFloat = 16
-    static let cardCornerRadius: CGFloat = 20
+    static let cornerRadius: CGFloat = 12
+    static let cardCornerRadius: CGFloat = 12
     static let chipCornerRadius: CGFloat = 20
     static let tabBarHeight: CGFloat = 80
 }

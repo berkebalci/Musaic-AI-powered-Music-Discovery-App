@@ -15,7 +15,7 @@ struct CustomTabBar: View {
                 tabButton(for: tab)
             }
         }
-        .padding(.horizontal, 8)
+        .padding(.horizontal, 4)
         .padding(.top, 12)
         .padding(.bottom, 24)
         .background(tabBarBackground)
@@ -33,12 +33,12 @@ struct CustomTabBar: View {
                 ZStack {
                     if selectedTab == tab {
                         Circle()
-                            .fill(Theme.accentCyan.opacity(0.15))
+                            .fill(Theme.primary.opacity(0.15))
                             .frame(width: 44, height: 44)
                     }
 
                     Image(systemName: tab.iconName)
-                        .font(.system(size: 20, weight: selectedTab == tab ? .semibold : .regular))
+                        .font(.system(size: 18, weight: selectedTab == tab ? .semibold : .regular))
                         .foregroundColor(selectedTab == tab ? Theme.tabBarActive : Theme.tabBarInactive)
                 }
                 .frame(height: 44)
@@ -66,4 +66,3 @@ struct CustomTabBar: View {
             .ignoresSafeArea(.container, edges: .bottom)
     }
 }
-
