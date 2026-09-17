@@ -33,6 +33,10 @@ Pods/
 *.p8
 **/apple-token/
 
+# Firebase Client Config — DO NOT COMMIT
+**/GoogleService-Info.plist
+!**/GoogleService-Info.plist.example
+
 # Backend — Ortam Değişkenleri ve Gizli Anahtarlar (Kesinlikle commitlenmez)
 .env
 .env.*
