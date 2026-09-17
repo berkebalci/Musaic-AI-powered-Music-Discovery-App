@@ -1,6 +1,4 @@
-# Xcode & iOS
-*.xcodeproj/xcuserdata/
-*.xcworkspace/xcuserdata/
+**/xcuserdata/
 build/
 DerivedData/
 *.moved-aside
