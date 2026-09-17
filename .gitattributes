@@ -1,0 +1,10 @@
+# GitHub Linguist Dil İstatistik Ayarları
+# Jupyter Notebook ve veri dosyalarını istatistiklerden hariç tut (Swift birincil görünsün)
+*.ipynb linguist-vendored
+*.ipynb linguist-detectable=false
+
+*.csv linguist-vendored
+*.csv linguist-detectable=false
+
+*.json linguist-vendored
+*.json linguist-detectable=false
