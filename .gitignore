@@ -16,5 +16,7 @@ __pycache__/
 
 # iOS Workspace / Harici Klasörler
 NlpMusicRecomSystem/
+*.xcodeproj/
+*.xcworkspace/
 *.xcuserstate
 .DS_Store
