@@ -43,7 +43,7 @@ final class APIFeedbackService: FeedbackServiceProtocol {
             responseType: BatchSwipeResponseDTO.self
         )
 
-        print("✅ Swipe oturumu gönderildi: \(response.message)")
-        return response.newVector
+        print("✅ Swipe oturumu gönderildi: ")
+        return response.newProfileVector
     }
 }

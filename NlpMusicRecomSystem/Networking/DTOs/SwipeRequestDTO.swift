@@ -42,8 +42,10 @@ struct BatchSwipeRequestDTO: Encodable {
 }
 
 /// Response from `POST /api/swipe`.
+/// API returns: {"status": "success", "new_profile_vector": [...], "liked_count": N}
+/// Note: APIClient uses `.convertFromSnakeCase` so property names auto-map.
 struct BatchSwipeResponseDTO: Decodable {
     let status: String
-    let newVector: [Double]
-    let message: String
+    let newProfileVector: [Double]
+    let likedCount: Int
 }

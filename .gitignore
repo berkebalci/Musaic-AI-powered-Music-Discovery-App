@@ -27,3 +27,7 @@ Pods/
 # Secrets — DO NOT COMMIT
 **/Secrets.xcconfig
 **/AppleMusicToken.swift
+
+# Apple Developer Private Keys — NEVER COMMIT
+*.p8
+**/apple-token/*.p8
