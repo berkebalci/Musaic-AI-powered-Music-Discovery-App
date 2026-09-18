@@ -14,12 +14,12 @@ Musaic bridges the gap between how you **feel** and what you **hear**. Instead o
 
 ## ✨ Features
 
-- 🎙️ **Natural Language Mood Input** — Describe how you feel in your own words
-- 🃏 **Swipe-Based Discovery** — Tinder-style card interface to explore recommendations
-- ❤️ **Favorites Library** — Save liked tracks, accessible offline
-- 🔄 **Adaptive Learning** — The more you swipe, the more personalized the feed becomes
-- 🎵 **Apple Music Integration** — Stream full songs directly inside the app via MusicKit
-- 🔒 **Firebase Authentication** — Secure sign-up / sign-in with email & password
+-  **Natural Language Mood Input** — Describe how you feel in your own words
+-  **Swipe-Based Discovery** — Tinder-style card interface to explore recommendations
+-  **Favorites Library** — Save liked tracks, accessible offline
+-  **Adaptive Learning** — The more you swipe, the more personalized the feed becomes
+-  **Apple Music Integration** — Stream full songs directly inside the app via MusicKit
+-  **Firebase Authentication** — Secure sign-up / sign-in with email & password
 
 <br/>
 
@@ -159,7 +159,6 @@ cp ~/Downloads/your-firebase-adminsdk.json firebase-key.json
 uvicorn api:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-> ⚠️ **Never commit** `firebase-key.json`, `.env`, or `GoogleService-Info.plist`. These are protected by `.gitignore`.
 
 <br/>
 
