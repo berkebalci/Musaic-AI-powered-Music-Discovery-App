@@ -1,11 +1,17 @@
 import os
 import json
 import google.generativeai as genai
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+
+# Rate Limiting — Slowapi (kullanıcı başına istek sınırı)
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 # Firebase ve Güvenlik modülleri
 from firebase_admin import firestore
@@ -20,8 +26,20 @@ if not GEMINI_KEY:
     raise ValueError("Gemini API anahtarı bulunamadı! Lütfen .env dosyanı kontrol et.")
 genai.configure(api_key=GEMINI_KEY)
 
+# --- RATE LIMITER KURULUMU ---
+# key_func: Her isteği kimin attığını belirler.
+# Firebase token doğrulandıktan sonra user_uid kullanmak ideal olmakla birlikte,
+# slowapi'nin decorator tabanlı mimarisiyle uyum için header IP'sini fallback olarak
+# kullanıyoruz. Gerçek limit mantığı aşağıdaki endpoint'lerde uid bazında uygulanıyor.
+limiter = Limiter(key_func=get_remote_address)
+
 # --- UYGULAMA VE MOTOR BAŞLATMA ---
 app = FastAPI()
+app.state.limiter = limiter
+
+# Rate Limit aşıldığında 429 JSON response dön
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 engine = RecommendationEngine()
 
 # Firestore Veritabanı Bağlantısı
@@ -36,6 +54,42 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# --- UID BAZLI RATE LIMIT YARDIMCI FONKSİYONLARI ---
+# Saldırgan aynı IP'den farklı hesaplarla saldırırsa IP limiti işe yarar.
+# Aynı hesaptan farklı IP'lerle (proxy, VPN) saldırırsa UID limiti işe yarar.
+# İkisini birden uygulayarak her iki saldırı vektörünü kapatıyoruz.
+
+# UID bazlı limitleri manuel takip eden basit in-memory sayaç.
+# Üretim ortamında Redis kullanılması önerilir ama bu proje için yeterlidir.
+import time
+from collections import defaultdict
+
+_uid_request_log: dict = defaultdict(list)  # {uid: [timestamp, timestamp, ...]}
+
+def _uid_rate_limit(uid: str, max_requests: int = 20, window_seconds: int = 60) -> bool:
+    """
+    UID başına kayan pencere (sliding window) rate limiter.
+    Döndürür: True → limit aşıldı (isteği reddet), False → limit içinde (devam et).
+
+    Çalışma mantığı:
+    1. Bu UID için son 60 saniyedeki tüm istek timestamp'lerini listeden al.
+    2. 60 saniyeden eski kayıtları temizle (sliding window).
+    3. Kalan istek sayısı >= max_requests ise reddet.
+    4. Değilse yeni timestamp'i ekle ve devam et.
+    """
+    now = time.time()
+    cutoff = now - window_seconds
+
+    # 60 saniyeden eski kayıtları temizle
+    _uid_request_log[uid] = [t for t in _uid_request_log[uid] if t > cutoff]
+
+    if len(_uid_request_log[uid]) >= max_requests:
+        return True  # Limit aşıldı
+
+    _uid_request_log[uid].append(now)
+    return False  # Devam et
 
 
 
@@ -145,7 +199,20 @@ def health_check():
 
 # Firestore maliyeti: SIFIR (gerçek anlamda Stateless).
 @app.post("/api/chat")
-def chat(request: ChatRequest, user_uid: str = Depends(verify_token)):
+@limiter.limit("20/minute")  # IP bazlı ön koruma (proxy/VPN saldırılarına karşı)
+def chat(request: Request, body: ChatRequest, user_uid: str = Depends(verify_token)):
+    # UID bazlı ek koruma: aynı kullanıcı farklı IP'lerden gelse bile sınırlanır.
+    if _uid_rate_limit(user_uid, max_requests=20, window_seconds=60):
+        raise HTTPException(
+            status_code=429,
+            detail={
+                "error": "rate_limit_exceeded",
+                "message": "Dakikada en fazla 20 chat isteği gönderebilirsiniz.",
+                "retry_after_seconds": 60,
+            }
+        )
+    # Orjinal fonksiyon gövdesine request → body olarak devam et
+    request = body
     print(f"\n--- [1] CHAT (Stateless) — Kullanıcı: {user_uid} ---")
     print(f" ⏱️ DEDEKTİF 1: iOS'tan istek ulaştı. Gelen mesaj: '{request.message}'")
 
@@ -237,7 +304,19 @@ def get_custom_recommendations(request: RecommendRequest, user_uid: str = Depend
 #SWIPE ENDPOINT 
 
 @app.post("/api/swipe")
-def swipe_batch(request: BatchSwipeRequest, user_uid: str = Depends(verify_token)):
+@limiter.limit("20/minute")  # IP bazlı ön koruma
+def swipe_batch(request: Request, body: BatchSwipeRequest, user_uid: str = Depends(verify_token)):
+    # UID bazlı ek koruma
+    if _uid_rate_limit(user_uid, max_requests=20, window_seconds=60):
+        raise HTTPException(
+            status_code=429,
+            detail={
+                "error": "rate_limit_exceeded",
+                "message": "Dakikada en fazla 20 swipe isteği gönderebilirsiniz.",
+                "retry_after_seconds": 60,
+            }
+        )
+    request = body
     print(f"\n--- [3] SWIPE — Kullanıcı: {user_uid} ---")
     print(f"  ✓ {len(request.liked_songs)} beğeni, {len(request.disliked_song_ids)} beğenmeme")
 
