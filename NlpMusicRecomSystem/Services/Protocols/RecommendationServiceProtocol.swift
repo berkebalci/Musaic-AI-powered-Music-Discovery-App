@@ -19,4 +19,6 @@ protocol RecommendationServiceProtocol {
     /// Takes a pre-computed mood vector and returns recommended songs.
     /// Used after chat produces a session vector.
     func getRecommendations(for vector: [Double], count: Int) async throws -> [Song]
+    
+    func getPreRecommendedSongList() -> [Song]
 }

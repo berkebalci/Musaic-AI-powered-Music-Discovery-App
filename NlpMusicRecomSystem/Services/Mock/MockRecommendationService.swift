@@ -25,6 +25,10 @@ final class MockRecommendationService: RecommendationServiceProtocol {
         Song(id: 8, title: "Somebody Else", artistName: "The 1975",
              genre: "Indie Pop", imageUrl: nil, popularity: 72, score: 0.85),
     ]
+    
+    func getPreRecommendedSongList() -> [Song] {
+        return mockCatalog
+    }
 
     func getRecommendations(for moodText: String) async throws -> RecommendationResult {
         // Simulate processing delay

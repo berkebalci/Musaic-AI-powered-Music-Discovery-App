@@ -14,10 +14,14 @@ final class APIRecommendationService: RecommendationServiceProtocol {
 
     private let apiClient: APIClientProtocol
     private let appleMusicService: AppleMusicServiceProtocol
+    private var preRecommendedSongs: [Song] = []
 
     init(apiClient: APIClientProtocol, appleMusicService: AppleMusicServiceProtocol) {
         self.apiClient = apiClient
         self.appleMusicService = appleMusicService
+    }
+    func getPreRecommendedSongList() -> [Song] {
+        return preRecommendedSongs
     }
 
     /// Sends the mood text to the API and retrieves recommended songs.
@@ -73,7 +77,9 @@ final class APIRecommendationService: RecommendationServiceProtocol {
         }
         
         let enrichedSongs = await fetchAppleMusicData(for: initialSongs)
-
+        if(preRecommendedSongs.isEmpty){
+            preRecommendedSongs = enrichedSongs
+        }
         return RecommendationResult(songs: enrichedSongs, moodVector: chatResponse.vector)
     }
 
@@ -91,7 +97,11 @@ final class APIRecommendationService: RecommendationServiceProtocol {
             song.toDomain(fallbackIndex: index)
         }
         
-        return await fetchAppleMusicData(for: initialSongs)
+        let enrichedSongs =  await fetchAppleMusicData(for: initialSongs)
+        if(preRecommendedSongs.isEmpty){
+            preRecommendedSongs = enrichedSongs
+        }
+        return enrichedSongs
     }
     
     // MARK: - Apple Music Enrichment

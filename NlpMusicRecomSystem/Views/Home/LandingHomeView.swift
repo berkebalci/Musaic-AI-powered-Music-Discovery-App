@@ -192,12 +192,19 @@ struct LandingHomeView: View {
     }
 
     // MARK: - Data Loading
-
+    @MainActor
     private func loadRecommendations() async {
-        guard recommendedSongs.isEmpty else { return }
+        let cachedSongs = recommendationService.getPreRecommendedSongList()
+        guard cachedSongs.isEmpty else {
+            await MainActor.run{
+                recommendedSongs = cachedSongs
+                isLoading = false
+            }
+            return }
         isLoading = true
 
         do {
+            print("ana sayfa muzik recommondation istegi atiliyor")
             let songs = try await recommendationService.getRecommendations(
                 for: defaultMoodVector,
                 count: 10
