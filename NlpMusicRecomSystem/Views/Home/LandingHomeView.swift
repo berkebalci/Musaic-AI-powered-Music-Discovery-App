@@ -13,9 +13,11 @@ struct LandingHomeView: View {
     @Binding var selectedTab: AppTab
     let recommendationService: any RecommendationServiceProtocol
     @ObservedObject var audioPlayer: AudioPlayerViewModel
+    let authService: any AuthServiceProtocol
 
     @State private var recommendedSongs: [Song] = []
     @State private var isLoading = false
+    @State private var showSignOutAlert = false
 
     /// Default neutral 9D mood vector for fetching general recommendations.
     private let defaultMoodVector: [Double] = Array(repeating: 0.5, count: 9)
@@ -80,26 +82,49 @@ struct LandingHomeView: View {
     // MARK: - Navigation Header
 
     private var navigationHeader: some View {
-        HStack {
-            Button {
-                selectedTab = .profile
-            } label: {
-                Image(systemName: "person.crop.circle")
-                    .font(.system(size: 0, weight: .regular))
-                    .foregroundColor(Theme.textSecondary)
-            }
-
-            Spacer()
-
+        ZStack {
+            // Centered title
             Text("Musaic")
-                .font(.system(size: 20, weight: .bold))
+                .font(.system(size: 32, weight: .bold))
                 .foregroundColor(Theme.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .center)
 
-            Spacer()
-
-            
+            // Sign Out button — trailing
+            HStack {
+                Spacer()
+                Button {
+                    showSignOutAlert = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .font(.system(size: 10.5, weight: .medium))
+                        Text("Sign Out")
+                            .font(.system(size: 10, weight: .medium))
+                    }
+                    .foregroundColor(Color(hex: "#FF6B6B"))
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 5)
+                    .background(
+                        Capsule()
+                            .fill(Color(hex: "#FF6B6B").opacity(0.10))
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color(hex: "#FF6B6B").opacity(0.25), lineWidth: 0.8)
+                            )
+                    )
+                }
+                .buttonStyle(ScaleButtonStyle())
+            }
         }
         .padding(.vertical, 12)
+        .alert("Sign Out", isPresented: $showSignOutAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Sign Out", role: .destructive) {
+                try? authService.signOut()
+            }
+        } message: {
+            Text("Are you sure you want to sign out?")
+        }
     }
 
     // MARK: - Hero Section
@@ -107,7 +132,7 @@ struct LandingHomeView: View {
     private var heroSection: some View {
         VStack(spacing: 12) {
             Text("AI-Powered Music\nSanctuary")
-                .font(.system(size: 32, weight: .bold))
+                .font(.system(size: 20, weight: .bold))
                 .foregroundColor(Theme.textPrimary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(2)

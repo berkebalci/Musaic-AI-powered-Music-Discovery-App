@@ -8,6 +8,7 @@ import SwiftUI
 struct MiniPlayerView: View {
 
     @ObservedObject var audioPlayer: AudioPlayerViewModel
+    
 
     var body: some View {
         if let song = audioPlayer.currentSong {
@@ -26,7 +27,20 @@ struct MiniPlayerView: View {
 
                 HStack(spacing: 12) {
                     // Album art
-                    AlbumArtPlaceholder(songId: song.id, size: 44, cornerRadius: 8)
+                    if let artworkURL = song.artworkURL {
+                        AsyncImage(url: artworkURL) { phase in
+                            if let image = phase.image {
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 44, height: 44)
+                                    .cornerRadius(8)
+                            } else {
+                                AlbumArtPlaceholder(songId: song.id, size: 44, cornerRadius: 8)
+                            }
+                        }
+                    } else {
+                        AlbumArtPlaceholder(songId: song.id, size: 48, cornerRadius: 8)}
 
                     // Song info
                     VStack(alignment: .leading, spacing: 2) {

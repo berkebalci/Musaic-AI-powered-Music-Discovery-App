@@ -61,10 +61,8 @@ final class ChatViewModel: ObservableObject {
         currentSessionVector = Array(repeating: 0.5, count: 9)
         messages = []
 
-        let greeting = ChatMessage.ai(
-            "Hello! I'm your AI mood curator. Tell me how you're feeling, or describe a vibe you're looking for."
-        )
-        messages.append(greeting)
+        //let greeting = ChatMessage.ai("Hello! I'm your AI mood curator. Tell me how you're feeling, or describe a vibe you're looking for.")
+        //messages.append(greeting)
 
         // Auto-send the initial mood as a user message
         inputText = moodText

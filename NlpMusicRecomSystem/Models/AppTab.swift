@@ -10,7 +10,7 @@ enum AppTab: Int, CaseIterable, Identifiable {
     case chat
     case discovery
     case yourMusic
-    case profile
+    // case profile  // TODO: Profile sayfası ilerleyen sürümde aktif edilecek
 
     var id: Int { rawValue }
 
@@ -20,7 +20,7 @@ enum AppTab: Int, CaseIterable, Identifiable {
         case .chat: return "Chat"
         case .discovery: return "Discovery"
         case .yourMusic: return "Library"
-        case .profile: return "Profile"
+        // case .profile: return "Profile"
         }
     }
 
@@ -30,7 +30,7 @@ enum AppTab: Int, CaseIterable, Identifiable {
         case .chat: return "bubble.left.and.bubble.right.fill"
         case .discovery: return "safari.fill"
         case .yourMusic: return "heart.fill"
-        case .profile: return "person.fill"
+        // case .profile: return "person.fill"
         }
     }
 }

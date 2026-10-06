@@ -55,7 +55,8 @@ struct MainTabView: View {
                     LandingHomeView(
                         selectedTab: $selectedTab,
                         recommendationService: container.recommendationService,
-                        audioPlayer: audioPlayerViewModel
+                        audioPlayer: audioPlayerViewModel,
+                        authService: container.authService
                     )
                 case .chat:
                     HomeView(
@@ -73,8 +74,8 @@ struct MainTabView: View {
                         viewModel: favoritesViewModel,
                         audioPlayer: audioPlayerViewModel
                     )
-                case .profile:
-                    ProfileView(authService: container.authService)
+                // case .profile:  // TODO: Profile sayfası ilerleyen sürümde aktif edilecek
+                //     ProfileView(authService: container.authService)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

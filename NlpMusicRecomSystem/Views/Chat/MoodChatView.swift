@@ -112,9 +112,7 @@ struct MoodChatView: View {
                     .foregroundColor(Theme.textPrimary)
             }
         }
-        .onAppear {
-            viewModel.onAppear()
-        }
+        
     }
 
     // MARK: - Chat Background

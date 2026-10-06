@@ -9,6 +9,7 @@ struct AlbumArtPlaceholder: View {
     let songId: Int
     let size: CGFloat
     var cornerRadius: CGFloat? = nil
+   
 
     private var gradient: [Color] {
         Theme.albumArtGradient(for: songId)

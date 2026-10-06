@@ -11,28 +11,32 @@ import Foundation
 
 // MARK: - API Errors
 
-enum APIError: LocalizedError {
-    case invalidResponse
-    case httpError(statusCode: Int, data: Data?)
-    case decodingFailed(Error)
+enum APIError: Error, LocalizedError {
     case networkUnavailable
     case authenticationRequired
+    case tooManyRequests(retryAfterSeconds: Int?) // 429 için süre bilgisi
+    case httpError(statusCode: Int, data: Data)
+    case decodingFailed(Error)
+    case invalidResponse
     case unknown(Error)
 
     var errorDescription: String? {
         switch self {
-        case .invalidResponse:
-            return "Sunucudan geçersiz bir yanıt alındı."
-        case .httpError(let code, _):
-            return "Sunucu hatası (HTTP \(code))."
-        case .decodingFailed:
-            return "Sunucu yanıtı okunamadı."
         case .networkUnavailable:
-            return "İnternet bağlantınızı kontrol edin."
+            return "İnternet bağlantısı bulunamadı."
         case .authenticationRequired:
-            return "Oturum açmanız gerekiyor."
-        case .unknown(let error):
-            return error.localizedDescription
+            return "Oturum süreniz doldu, lütfen tekrar giriş yapın."
+        case .tooManyRequests(let seconds):
+            if let seconds = seconds {
+                return "Çok fazla istek yapıldı. Lütfen \(seconds) saniye sonra tekrar deneyin."
+            }
+            return "Çok fazla istek yapıldı. Lütfen biraz bekleyip tekrar deneyin."
+        case .httpError(let statusCode, _):
+            return "Sunucu hatası oluştu (Kod: \(statusCode))."
+        case .decodingFailed:
+            return "Gelen veri işlenirken hata oluştu."
+        case .invalidResponse, .unknown:
+            return "Beklenmeyen bir hata oluştu."
         }
     }
 }
@@ -137,44 +141,67 @@ final class APIClient: APIClientProtocol {
         _ request: URLRequest,
         responseType: Response.Type
     ) async throws -> Response {
-        let data: Data
-        let urlResponse: URLResponse
-
-        do {
-            (data, urlResponse) = try await session.data(for: request)
-        } catch let error as URLError where error.code == .notConnectedToInternet {
-            throw APIError.networkUnavailable
-        } catch {
-            throw APIError.unknown(error)
-        }
-
-        guard let httpResponse = urlResponse as? HTTPURLResponse else {
-            throw APIError.invalidResponse
-        }
-
-        // Handle 401/403 as authentication errors
-        if httpResponse.statusCode == 401 || httpResponse.statusCode == 403 {
-            let responseBody = String(data: data, encoding: .utf8) ?? "No body"
-            print("❌ [APIClient] Server rejected auth. Status: \(httpResponse.statusCode)")
-            print("❌ [APIClient] Response body: \(responseBody)")
-            print("❌ [APIClient] Request URL was: \(request.url?.absoluteString ?? "Unknown URL")")
-            throw APIError.authenticationRequired
-        }
-
-        guard (200...299).contains(httpResponse.statusCode) else {
-            throw APIError.httpError(statusCode: httpResponse.statusCode, data: data)
-        }
-
-        do {
-            return try decoder.decode(responseType, from: data)
-        } catch {
-            #if DEBUG
-            if let raw = String(data: data, encoding: .utf8) {
-                print("[APIClient] Decode error for \(responseType): \(error)")
-                print("[APIClient] Raw response: \(raw)")
+        do{
+            let data: Data
+            let urlResponse: URLResponse
+            
+            do {
+                (data, urlResponse) = try await session.data(for: request)
+            } catch let error as URLError where error.code == .notConnectedToInternet {
+                throw APIError.networkUnavailable
+            } catch {
+                throw APIError.unknown(error)
             }
-            #endif
-            throw APIError.decodingFailed(error)
+            
+            guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                throw APIError.invalidResponse
+            }
+            
+            // Handle 401/403 as authentication errors
+            if httpResponse.statusCode == 401 || httpResponse.statusCode == 403 {
+                let responseBody = String(data: data, encoding: .utf8) ?? "No body"
+                print("❌ [APIClient] Server rejected auth. Status: \(httpResponse.statusCode)")
+                print("❌ [APIClient] Response body: \(responseBody)")
+                print("❌ [APIClient] Request URL was: \(request.url?.absoluteString ?? "Unknown URL")")
+                throw APIError.authenticationRequired
+            }
+            
+            if httpResponse.statusCode == 429 {
+                var retrySeconds: Int? = nil
+                
+                // HTTP Header isimleri case-insensitive olabilir, bu yüzden güvenli arama yapılır:
+                if let retryHeaderValue = httpResponse.value(forHTTPHeaderField: "Retry-After") {
+                    retrySeconds = Int(retryHeaderValue)
+                }
+                
+#if DEBUG
+                print("⚠️️ [APIClient] 429 Rate Limited! Retry-After: \(retrySeconds?.description ?? "Yok")")
+#endif
+                
+                throw APIError.tooManyRequests(retryAfterSeconds: retrySeconds)
+            }
+            
+            guard (200...299).contains(httpResponse.statusCode) else {
+                throw APIError.httpError(statusCode: httpResponse.statusCode, data: data)
+            }
+            
+            do {
+                return try decoder.decode(responseType, from: data)
+            } catch {
+#if DEBUG
+                if let raw = String(data: data, encoding: .utf8) {
+                    print("[APIClient] Decode error for \(responseType): \(error)")
+                    print("[APIClient] Raw response: \(raw)")
+                }
+#endif
+                throw APIError.decodingFailed(error)
+            }
+        }
+        catch{
+            await MainActor.run {
+                GlobalErrorManager.shared.handle(error)
+            }
+            throw error
         }
     }
 }
