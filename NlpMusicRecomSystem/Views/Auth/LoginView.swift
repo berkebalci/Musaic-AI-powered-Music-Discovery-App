@@ -4,6 +4,8 @@
 //
 
 import SwiftUI
+import AuthenticationServices
+
 
 struct LoginView: View {
 
@@ -43,16 +45,12 @@ struct LoginView: View {
                         ZStack {
                             Circle()
                                 .fill(Theme.accentCyan.opacity(0.15))
-                                .frame(width: 80, height: 80)
-                            Image(systemName: "music.note.list")
-                                .font(.system(size: 36, weight: .semibold))
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [Theme.accentCyan, Theme.accentPurple],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
+                                .frame(width: 100, height: 100)
+                            Image("musaiclogo")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 66, height: 66)
+                                .clipShape(Circle())
                         }
 
                         Text("Welcome Back")
@@ -65,7 +63,26 @@ struct LoginView: View {
                             .multilineTextAlignment(.center)
                     }
                     .padding(.bottom, 44)
-
+                    
+                    // Sign in with Apple
+                    SignInWithAppleButton(.signIn) { request in
+                        viewModel.handlewithSignInWithAppleRequest(request: request)
+                    } onCompletion: { result in
+                        viewModel.handlewithSignInWithAppleCompletition(result: result)
+                    }
+                    .signInWithAppleButtonStyle(.whiteOutline)
+                    .frame(height: 54)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 28)
+                    
+                    HStack {
+                        Rectangle().fill(Theme.cardBorder).frame(height: 1)
+                        Text("or").font(Theme.captionFont).foregroundColor(Theme.textTertiary).padding(.horizontal, 12)
+                        Rectangle().fill(Theme.cardBorder).frame(height: 1)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 15)
                     // Form Card
                     VStack(spacing: 16) {
                         AuthTextField(
@@ -130,14 +147,7 @@ struct LoginView: View {
                     .padding(.horizontal, 24)
 
                     // Divider
-                    HStack {
-                        Rectangle().fill(Theme.cardBorder).frame(height: 1)
-                        Text("or").font(Theme.captionFont).foregroundColor(Theme.textTertiary).padding(.horizontal, 12)
-                        Rectangle().fill(Theme.cardBorder).frame(height: 1)
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 28)
-
+                    Spacer().frame(height: 20)
                     // Sign Up CTA
                     VStack(spacing: 4) {
                         Text("Don't have an account?")

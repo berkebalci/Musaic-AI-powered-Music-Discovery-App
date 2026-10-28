@@ -19,6 +19,7 @@ enum APIError: Error, LocalizedError {
     case decodingFailed(Error)
     case invalidResponse
     case unknown(Error)
+    case autherizationFailed
 
     var errorDescription: String? {
         switch self {
@@ -37,6 +38,8 @@ enum APIError: Error, LocalizedError {
             return "Gelen veri işlenirken hata oluştu."
         case .invalidResponse, .unknown:
             return "Beklenmeyen bir hata oluştu."
+        case .autherizationFailed:
+            return "Autherization has failed while sending request to Firebase Provider "
         }
     }
 }

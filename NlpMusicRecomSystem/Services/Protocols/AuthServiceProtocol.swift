@@ -5,6 +5,7 @@
 
 import Foundation
 import Combine
+import FirebaseAuth
 
 /// A lightweight representation of the authenticated user,
 /// decoupled from any specific Firebase type.
@@ -21,9 +22,10 @@ protocol AuthServiceProtocol: AnyObject {
     var currentUser: AuthUser? { get }
 
     func signIn(email: String, password: String) async throws
+    //func signInWithApple() async throws
     func signUp(email: String, password: String) async throws
     func signOut() throws
-
+    func signInWithApple(credential: OAuthCredential)async throws ->  AuthDataResult
     /// Returns a fresh Firebase ID token for API authentication.
     /// The token is sent as `Authorization: Bearer <token>` in API requests.
     func getIDToken() async throws -> String

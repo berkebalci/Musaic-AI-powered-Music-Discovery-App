@@ -1,0 +1,518 @@
+{
+  "NlpMusicRecomSystem/AppDelegate.swift": {
+    "mtime": 1789675455.7994864,
+    "seen": 1791479305.774552,
+    "ast_hash": "eefcfc67413407d1766a03b94efe93a4",
+    "semantic_hash": "eefcfc67413407d1766a03b94efe93a4"
+  },
+  "NlpMusicRecomSystem/Assets.xcassets/AccentColor.colorset/Contents.json": {
+    "mtime": 1789675455.799727,
+    "seen": 1791479305.774555,
+    "ast_hash": "55019f7265dde0a78318b0807f98e847",
+    "semantic_hash": "55019f7265dde0a78318b0807f98e847"
+  },
+  "NlpMusicRecomSystem/Assets.xcassets/AppIcon.appiconset/Contents.json": {
+    "mtime": 1791473162.316323,
+    "seen": 1791479305.774556,
+    "ast_hash": "cbe75704b2680422c4156009a528e292",
+    "semantic_hash": "cbe75704b2680422c4156009a528e292"
+  },
+  "NlpMusicRecomSystem/Assets.xcassets/Contents.json": {
+    "mtime": 1791474295.019959,
+    "seen": 1791479305.774556,
+    "ast_hash": "9deb2ada1cc834bbebf8bbad9c8978a1",
+    "semantic_hash": "9deb2ada1cc834bbebf8bbad9c8978a1"
+  },
+  "NlpMusicRecomSystem/Assets.xcassets/Home Hero Banner.imageset/Contents.json": {
+    "mtime": 1789675455.8001726,
+    "seen": 1791479305.7745569,
+    "ast_hash": "349a11af507628662b2a7783c8208cd1",
+    "semantic_hash": "349a11af507628662b2a7783c8208cd1"
+  },
+  "NlpMusicRecomSystem/Assets.xcassets/hero banner 2.imageset/Contents.json": {
+    "mtime": 1789675455.8069441,
+    "seen": 1791479305.774558,
+    "ast_hash": "756b00cbe90cb173b2c257c907cbc08a",
+    "semantic_hash": "756b00cbe90cb173b2c257c907cbc08a"
+  },
+  "NlpMusicRecomSystem/Assets.xcassets/hero banner 3.imageset/Contents.json": {
+    "mtime": 1789675455.812051,
+    "seen": 1791479305.774558,
+    "ast_hash": "756b00cbe90cb173b2c257c907cbc08a",
+    "semantic_hash": "756b00cbe90cb173b2c257c907cbc08a"
+  },
+  "NlpMusicRecomSystem/Assets.xcassets/musaiclogo.imageset/Contents.json": {
+    "mtime": 1791474295.019855,
+    "seen": 1791479305.774559,
+    "ast_hash": "05f8dfa5d8dfde5ee6ef6a9c02b85edd",
+    "semantic_hash": "05f8dfa5d8dfde5ee6ef6a9c02b85edd"
+  },
+  "NlpMusicRecomSystem/DI/DIContainer.swift": {
+    "mtime": 1789675455.8181517,
+    "seen": 1791479305.774559,
+    "ast_hash": "2e62fa6bee4ac9db5c28b92c5b25aef0",
+    "semantic_hash": "2e62fa6bee4ac9db5c28b92c5b25aef0"
+  },
+  "NlpMusicRecomSystem/DesignSystem/Components/AlbumArtPlaceholder.swift": {
+    "mtime": 1791311444.5477326,
+    "seen": 1791479305.77456,
+    "ast_hash": "e42dce5c0fa108178ef178dc28367645",
+    "semantic_hash": "e42dce5c0fa108178ef178dc28367645"
+  },
+  "NlpMusicRecomSystem/DesignSystem/Components/AnimatedSparkle.swift": {
+    "mtime": 1789675455.8184934,
+    "seen": 1791479305.77456,
+    "ast_hash": "9a76128df98ed8e623d9876bd9a51c63",
+    "semantic_hash": "9a76128df98ed8e623d9876bd9a51c63"
+  },
+  "NlpMusicRecomSystem/DesignSystem/Components/GlassmorphicCard.swift": {
+    "mtime": 1789675455.8186145,
+    "seen": 1791479305.774561,
+    "ast_hash": "a24cc3447d8ac2bea28498fba6e1b064",
+    "semantic_hash": "a24cc3447d8ac2bea28498fba6e1b064"
+  },
+  "NlpMusicRecomSystem/DesignSystem/Components/GradientBackground.swift": {
+    "mtime": 1789675455.8187022,
+    "seen": 1791479305.7745621,
+    "ast_hash": "bcf09ce64ec5ed8928e0cc88262e42f4",
+    "semantic_hash": "bcf09ce64ec5ed8928e0cc88262e42f4"
+  },
+  "NlpMusicRecomSystem/DesignSystem/Theme.swift": {
+    "mtime": 1789675455.8188457,
+    "seen": 1791479305.7745621,
+    "ast_hash": "12b3d8f760980ee7a2c8deeeb1010d0d",
+    "semantic_hash": "12b3d8f760980ee7a2c8deeeb1010d0d"
+  },
+  "NlpMusicRecomSystem/Extensions/Color+Hex.swift": {
+    "mtime": 1789675455.8189936,
+    "seen": 1791479305.774563,
+    "ast_hash": "549e534085c6e7f56ee8a084b4193a63",
+    "semantic_hash": "549e534085c6e7f56ee8a084b4193a63"
+  },
+  "NlpMusicRecomSystem/Models/AppTab.swift": {
+    "mtime": 1791284597.2326715,
+    "seen": 1791479305.774563,
+    "ast_hash": "9b647d9624f1c2d58de5e80b7f1856cb",
+    "semantic_hash": "9b647d9624f1c2d58de5e80b7f1856cb"
+  },
+  "NlpMusicRecomSystem/Models/ChatMessage.swift": {
+    "mtime": 1789675455.8193827,
+    "seen": 1791479305.774564,
+    "ast_hash": "1d839dc305df5a457a4021670a7460b7",
+    "semantic_hash": "1d839dc305df5a457a4021670a7460b7"
+  },
+  "NlpMusicRecomSystem/Models/MoodVector.swift": {
+    "mtime": 1789675455.8194644,
+    "seen": 1791479305.774564,
+    "ast_hash": "9fbb2497dc0a5806db34c64b383bd9f6",
+    "semantic_hash": "9fbb2497dc0a5806db34c64b383bd9f6"
+  },
+  "NlpMusicRecomSystem/Models/Song.swift": {
+    "mtime": 1789675455.81955,
+    "seen": 1791479305.7745652,
+    "ast_hash": "4427db4e4ef4bcab89468ccaab81c682",
+    "semantic_hash": "4427db4e4ef4bcab89468ccaab81c682"
+  },
+  "NlpMusicRecomSystem/Models/UserInteraction.swift": {
+    "mtime": 1789675455.8196375,
+    "seen": 1791479305.7745652,
+    "ast_hash": "43121bb635486d5764899ec4f8a9918c",
+    "semantic_hash": "43121bb635486d5764899ec4f8a9918c"
+  },
+  "NlpMusicRecomSystem/Networking/APIClient.swift": {
+    "mtime": 1791283306.2880177,
+    "seen": 1791479305.774566,
+    "ast_hash": "83880d2cd3ff6abea007c97a43a04ec4",
+    "semantic_hash": "83880d2cd3ff6abea007c97a43a04ec4"
+  },
+  "NlpMusicRecomSystem/Networking/APIEnvironment.swift": {
+    "mtime": 1789675455.8199031,
+    "seen": 1791479305.774566,
+    "ast_hash": "ea381c4a5be240cec82c6aceb5952781",
+    "semantic_hash": "ea381c4a5be240cec82c6aceb5952781"
+  },
+  "NlpMusicRecomSystem/Networking/DTOs/ChatRequestDTO.swift": {
+    "mtime": 1789675455.8200529,
+    "seen": 1791479305.774567,
+    "ast_hash": "d0ecd0048f07f91f93eedf330f159886",
+    "semantic_hash": "d0ecd0048f07f91f93eedf330f159886"
+  },
+  "NlpMusicRecomSystem/Networking/DTOs/FavoritesResponseDTO.swift": {
+    "mtime": 1789675455.8201454,
+    "seen": 1791479305.7745678,
+    "ast_hash": "86bac57b69771ac1bf7c6f328797c200",
+    "semantic_hash": "86bac57b69771ac1bf7c6f328797c200"
+  },
+  "NlpMusicRecomSystem/Networking/DTOs/HealthResponseDTO.swift": {
+    "mtime": 1789675455.8202412,
+    "seen": 1791479305.7745678,
+    "ast_hash": "991a52bd545a69f744e13da8f2b770d0",
+    "semantic_hash": "991a52bd545a69f744e13da8f2b770d0"
+  },
+  "NlpMusicRecomSystem/Networking/DTOs/RecommendRequestDTO.swift": {
+    "mtime": 1789675455.8203416,
+    "seen": 1791479305.774569,
+    "ast_hash": "e09ec0e78cbaf642c4538529bab4c8c1",
+    "semantic_hash": "e09ec0e78cbaf642c4538529bab4c8c1"
+  },
+  "NlpMusicRecomSystem/Networking/DTOs/RecommendResponseDTO.swift": {
+    "mtime": 1789675455.8204384,
+    "seen": 1791479305.774569,
+    "ast_hash": "e3a2e6e9f81c3c09d05633f021c1d859",
+    "semantic_hash": "e3a2e6e9f81c3c09d05633f021c1d859"
+  },
+  "NlpMusicRecomSystem/Networking/DTOs/SwipeRequestDTO.swift": {
+    "mtime": 1789675455.82053,
+    "seen": 1791479305.77457,
+    "ast_hash": "3d82d9db459b2abdd255d2e53d1f7b10",
+    "semantic_hash": "3d82d9db459b2abdd255d2e53d1f7b10"
+  },
+  "NlpMusicRecomSystem/NlpMusicRecomSystemApp.swift": {
+    "mtime": 1789675455.8207285,
+    "seen": 1791479305.77457,
+    "ast_hash": "47ee5031337da02a0fc80241137769b7",
+    "semantic_hash": "47ee5031337da02a0fc80241137769b7"
+  },
+  "NlpMusicRecomSystem/Services/API/APIChatService.swift": {
+    "mtime": 1789675455.820936,
+    "seen": 1791479305.774571,
+    "ast_hash": "869008deb45539eec4c19f4e65b48b69",
+    "semantic_hash": "869008deb45539eec4c19f4e65b48b69"
+  },
+  "NlpMusicRecomSystem/Services/API/APIFavoritesService.swift": {
+    "mtime": 1789675455.8210244,
+    "seen": 1791479305.774571,
+    "ast_hash": "068e76e5c6746e93bff002332546bd98",
+    "semantic_hash": "068e76e5c6746e93bff002332546bd98"
+  },
+  "NlpMusicRecomSystem/Services/API/APIFeedbackService.swift": {
+    "mtime": 1789675455.8211217,
+    "seen": 1791479305.7745721,
+    "ast_hash": "2a480e9747572391ee941c3da68c54a2",
+    "semantic_hash": "2a480e9747572391ee941c3da68c54a2"
+  },
+  "NlpMusicRecomSystem/Services/API/APIHealthService.swift": {
+    "mtime": 1789675455.8212106,
+    "seen": 1791479305.7745721,
+    "ast_hash": "f47e3f22bdcd2e1109223282086c276d",
+    "semantic_hash": "f47e3f22bdcd2e1109223282086c276d"
+  },
+  "NlpMusicRecomSystem/Services/API/APIRecommendationService.swift": {
+    "mtime": 1791057436.3900583,
+    "seen": 1791479305.774573,
+    "ast_hash": "723e675a1eba4cfecc87dcb183d3a7a5",
+    "semantic_hash": "723e675a1eba4cfecc87dcb183d3a7a5"
+  },
+  "NlpMusicRecomSystem/Services/API/AppleMusicService.swift": {
+    "mtime": 1789675455.8214087,
+    "seen": 1791479305.774573,
+    "ast_hash": "9c23a0fd7bfb333a666de547fdb8f5d0",
+    "semantic_hash": "9c23a0fd7bfb333a666de547fdb8f5d0"
+  },
+  "NlpMusicRecomSystem/Services/API/FirebaseAuthService.swift": {
+    "mtime": 1791467726.7629564,
+    "seen": 1791479305.774574,
+    "ast_hash": "dbea328455d9236a0b53b24fe118391f",
+    "semantic_hash": "dbea328455d9236a0b53b24fe118391f"
+  },
+  "NlpMusicRecomSystem/Services/Mock/MockChatService.swift": {
+    "mtime": 1789675455.821644,
+    "seen": 1791479305.774574,
+    "ast_hash": "b14c8cc91071e2e368fe6d2f3e0d4e74",
+    "semantic_hash": "b14c8cc91071e2e368fe6d2f3e0d4e74"
+  },
+  "NlpMusicRecomSystem/Services/Mock/MockFavoritesService.swift": {
+    "mtime": 1789675455.8217402,
+    "seen": 1791479305.774575,
+    "ast_hash": "19510fcc2e448d4482fea5d4be38da31",
+    "semantic_hash": "19510fcc2e448d4482fea5d4be38da31"
+  },
+  "NlpMusicRecomSystem/Services/Mock/MockFeedbackService.swift": {
+    "mtime": 1789675455.8218315,
+    "seen": 1791479305.774575,
+    "ast_hash": "eaf9facfee712a4cd3caf729b4ed4e65",
+    "semantic_hash": "eaf9facfee712a4cd3caf729b4ed4e65"
+  },
+  "NlpMusicRecomSystem/Services/Mock/MockNLPService.swift": {
+    "mtime": 1789675455.8219244,
+    "seen": 1791479305.7745762,
+    "ast_hash": "8aa0b7f214cb522487422c6698a54f11",
+    "semantic_hash": "8aa0b7f214cb522487422c6698a54f11"
+  },
+  "NlpMusicRecomSystem/Services/Mock/MockRecommendationService.swift": {
+    "mtime": 1791056130.343615,
+    "seen": 1791479305.7745762,
+    "ast_hash": "8a5de1eb884719ee25c9d4c3ae62f1ae",
+    "semantic_hash": "8a5de1eb884719ee25c9d4c3ae62f1ae"
+  },
+  "NlpMusicRecomSystem/Services/Protocols/AppleMusicServiceProtocol.swift": {
+    "mtime": 1789675455.822199,
+    "seen": 1791479305.774577,
+    "ast_hash": "ab1155a4464b0464cb69f71bd4aefb3c",
+    "semantic_hash": "ab1155a4464b0464cb69f71bd4aefb3c"
+  },
+  "NlpMusicRecomSystem/Services/Protocols/AuthServiceProtocol.swift": {
+    "mtime": 1791467708.604664,
+    "seen": 1791479305.7745779,
+    "ast_hash": "3e92b37cd5e1127f78bcf32e9c369a5b",
+    "semantic_hash": "3e92b37cd5e1127f78bcf32e9c369a5b"
+  },
+  "NlpMusicRecomSystem/Services/Protocols/ChatServiceProtocol.swift": {
+    "mtime": 1789675455.8223693,
+    "seen": 1791479305.7745779,
+    "ast_hash": "4f150f8311268ab36d80eb503a22147c",
+    "semantic_hash": "4f150f8311268ab36d80eb503a22147c"
+  },
+  "NlpMusicRecomSystem/Services/Protocols/FavoritesServiceProtocol.swift": {
+    "mtime": 1789675455.822457,
+    "seen": 1791479305.774579,
+    "ast_hash": "c76d98a7a8ae969eade89dc0180eea0b",
+    "semantic_hash": "c76d98a7a8ae969eade89dc0180eea0b"
+  },
+  "NlpMusicRecomSystem/Services/Protocols/FeedbackServiceProtocol.swift": {
+    "mtime": 1789675455.8225496,
+    "seen": 1791479305.774579,
+    "ast_hash": "a0c431bc809b4e002b1781609d3a021f",
+    "semantic_hash": "a0c431bc809b4e002b1781609d3a021f"
+  },
+  "NlpMusicRecomSystem/Services/Protocols/NLPServiceProtocol.swift": {
+    "mtime": 1789675455.8226323,
+    "seen": 1791479305.77458,
+    "ast_hash": "98d218825d3c01d04be66b01876f9913",
+    "semantic_hash": "98d218825d3c01d04be66b01876f9913"
+  },
+  "NlpMusicRecomSystem/Services/Protocols/RecommendationServiceProtocol.swift": {
+    "mtime": 1791055874.4468515,
+    "seen": 1791479305.774581,
+    "ast_hash": "0a49d9b6d2cbba391f2b1a4825b4cc22",
+    "semantic_hash": "0a49d9b6d2cbba391f2b1a4825b4cc22"
+  },
+  "NlpMusicRecomSystem/Utils/GlobalErrorManager.swift": {
+    "mtime": 1791281457.6505437,
+    "seen": 1791479305.774581,
+    "ast_hash": "790749e7d6e27249291924902a4aee77",
+    "semantic_hash": "790749e7d6e27249291924902a4aee77"
+  },
+  "NlpMusicRecomSystem/ViewModels/AudioPlayerViewModel.swift": {
+    "mtime": 1789675455.82291,
+    "seen": 1791479305.774582,
+    "ast_hash": "cc59b930883fa6bc409d9e74f3e2973f",
+    "semantic_hash": "cc59b930883fa6bc409d9e74f3e2973f"
+  },
+  "NlpMusicRecomSystem/ViewModels/AuthViewModel.swift": {
+    "mtime": 1791477367.9750636,
+    "seen": 1791479305.774582,
+    "ast_hash": "5542f9b8ec11c69b601ad5af7e39dcd5",
+    "semantic_hash": "5542f9b8ec11c69b601ad5af7e39dcd5"
+  },
+  "NlpMusicRecomSystem/ViewModels/ChatViewModel.swift": {
+    "mtime": 1791304316.198443,
+    "seen": 1791479305.774583,
+    "ast_hash": "e6cf5e4a080836206bd88a18a29224de",
+    "semantic_hash": "e6cf5e4a080836206bd88a18a29224de"
+  },
+  "NlpMusicRecomSystem/ViewModels/DiscoveryViewModel.swift": {
+    "mtime": 1789675455.8232436,
+    "seen": 1791479305.774583,
+    "ast_hash": "e95f789949c0cd72b38d9d237672d7dc",
+    "semantic_hash": "e95f789949c0cd72b38d9d237672d7dc"
+  },
+  "NlpMusicRecomSystem/ViewModels/FavoritesViewModel.swift": {
+    "mtime": 1789675455.82337,
+    "seen": 1791479305.774584,
+    "ast_hash": "08de3adad21821ba6e98d1613dea9fb3",
+    "semantic_hash": "08de3adad21821ba6e98d1613dea9fb3"
+  },
+  "NlpMusicRecomSystem/Views/Auth/AuthComponents.swift": {
+    "mtime": 1791474380.1321275,
+    "seen": 1791479305.774584,
+    "ast_hash": "c8f0681b2e5f8da00c24ddab7f3fe414",
+    "semantic_hash": "c8f0681b2e5f8da00c24ddab7f3fe414"
+  },
+  "NlpMusicRecomSystem/Views/Auth/LoginView.swift": {
+    "mtime": 1791476634.563334,
+    "seen": 1791479305.774585,
+    "ast_hash": "e1fa85830d040f26620428be2a6c58ef",
+    "semantic_hash": "e1fa85830d040f26620428be2a6c58ef"
+  },
+  "NlpMusicRecomSystem/Views/Auth/SignUpView.swift": {
+    "mtime": 1789675455.8239334,
+    "seen": 1791479305.774585,
+    "ast_hash": "3bdf76719e3393dfacaa8fd4af9cedf1",
+    "semantic_hash": "3bdf76719e3393dfacaa8fd4af9cedf1"
+  },
+  "NlpMusicRecomSystem/Views/Chat/Components/ChatBubbleView.swift": {
+    "mtime": 1789675455.8241818,
+    "seen": 1791479305.7745862,
+    "ast_hash": "525ab4b49e6db010c1d0e78fba5900e9",
+    "semantic_hash": "525ab4b49e6db010c1d0e78fba5900e9"
+  },
+  "NlpMusicRecomSystem/Views/Chat/Components/ChatInputBarView.swift": {
+    "mtime": 1789675455.8242857,
+    "seen": 1791479305.7745862,
+    "ast_hash": "e2879294c2e075f38508e66d90f6b800",
+    "semantic_hash": "e2879294c2e075f38508e66d90f6b800"
+  },
+  "NlpMusicRecomSystem/Views/Chat/Components/ChatSongCardView.swift": {
+    "mtime": 1791304934.1305184,
+    "seen": 1791479305.774587,
+    "ast_hash": "a557447f6cb0c755a4d606a17af10b6c",
+    "semantic_hash": "a557447f6cb0c755a4d606a17af10b6c"
+  },
+  "NlpMusicRecomSystem/Views/Chat/MoodChatView.swift": {
+    "mtime": 1791304199.9673328,
+    "seen": 1791479305.774587,
+    "ast_hash": "9a078485dd0f3b36f6bbfb1f2294fd7b",
+    "semantic_hash": "9a078485dd0f3b36f6bbfb1f2294fd7b"
+  },
+  "NlpMusicRecomSystem/Views/Common/CustomTabBar.swift": {
+    "mtime": 1789675455.8246868,
+    "seen": 1791479305.7745879,
+    "ast_hash": "32654b25882c8077813c1f2b79d355ad",
+    "semantic_hash": "32654b25882c8077813c1f2b79d355ad"
+  },
+  "NlpMusicRecomSystem/Views/Common/FlowLayout.swift": {
+    "mtime": 1789675455.8247952,
+    "seen": 1791479305.7745879,
+    "ast_hash": "4811905f50ce8d1605613ecb4bd429fd",
+    "semantic_hash": "4811905f50ce8d1605613ecb4bd429fd"
+  },
+  "NlpMusicRecomSystem/Views/Common/LoadingView.swift": {
+    "mtime": 1789675455.8248777,
+    "seen": 1791479305.7745888,
+    "ast_hash": "317c8991e779f2075dc97cf0ea8b4038",
+    "semantic_hash": "317c8991e779f2075dc97cf0ea8b4038"
+  },
+  "NlpMusicRecomSystem/Views/Common/MiniPlayerView.swift": {
+    "mtime": 1791311663.6729493,
+    "seen": 1791479305.7745888,
+    "ast_hash": "677c05296aa0a2234a3c06efff5de8d2",
+    "semantic_hash": "677c05296aa0a2234a3c06efff5de8d2"
+  },
+  "NlpMusicRecomSystem/Views/Discovery/Components/ActionButtonsView.swift": {
+    "mtime": 1789675455.8250759,
+    "seen": 1791479305.77459,
+    "ast_hash": "4b0bf6f32a200d94436803be011f8a49",
+    "semantic_hash": "4b0bf6f32a200d94436803be011f8a49"
+  },
+  "NlpMusicRecomSystem/Views/Discovery/Components/CardStackView.swift": {
+    "mtime": 1789675455.825168,
+    "seen": 1791479305.77459,
+    "ast_hash": "d6fdc8ef896d36610e24393772940464",
+    "semantic_hash": "d6fdc8ef896d36610e24393772940464"
+  },
+  "NlpMusicRecomSystem/Views/Discovery/Components/MoodChipView.swift": {
+    "mtime": 1789675455.8252566,
+    "seen": 1791479305.774591,
+    "ast_hash": "01aa288a0728deaccae6f670c9afac05",
+    "semantic_hash": "01aa288a0728deaccae6f670c9afac05"
+  },
+  "NlpMusicRecomSystem/Views/Discovery/Components/SwipeCardView.swift": {
+    "mtime": 1789675455.8253675,
+    "seen": 1791479305.774591,
+    "ast_hash": "336c2a380f88d0986093e170a5c8c5aa",
+    "semantic_hash": "336c2a380f88d0986093e170a5c8c5aa"
+  },
+  "NlpMusicRecomSystem/Views/Discovery/DiscoveryContainerView.swift": {
+    "mtime": 1789675455.825467,
+    "seen": 1791479305.774592,
+    "ast_hash": "3a237b49fd7a25dc20f294bca9d1133f",
+    "semantic_hash": "3a237b49fd7a25dc20f294bca9d1133f"
+  },
+  "NlpMusicRecomSystem/Views/Discovery/DiscoveryLandingView.swift": {
+    "mtime": 1791284592.65003,
+    "seen": 1791479305.774592,
+    "ast_hash": "cd0cd108efcb0c9142e298a701f3af11",
+    "semantic_hash": "cd0cd108efcb0c9142e298a701f3af11"
+  },
+  "NlpMusicRecomSystem/Views/Discovery/DiscoverySwipeView.swift": {
+    "mtime": 1789675455.8257003,
+    "seen": 1791479305.774593,
+    "ast_hash": "9000a4b8f8db9b87fae93dfefef679f9",
+    "semantic_hash": "9000a4b8f8db9b87fae93dfefef679f9"
+  },
+  "NlpMusicRecomSystem/Views/Discovery/MoodInputView.swift": {
+    "mtime": 1789675455.8257892,
+    "seen": 1791479305.774593,
+    "ast_hash": "ffa590269d39492d48b49d1591b8ef8b",
+    "semantic_hash": "ffa590269d39492d48b49d1591b8ef8b"
+  },
+  "NlpMusicRecomSystem/Views/Favorites/Components/SongRowView.swift": {
+    "mtime": 1789675455.826084,
+    "seen": 1791479305.774594,
+    "ast_hash": "cefcbac882e22c32eaf70be5c2c1c7a9",
+    "semantic_hash": "cefcbac882e22c32eaf70be5c2c1c7a9"
+  },
+  "NlpMusicRecomSystem/Views/Favorites/FavoritesView.swift": {
+    "mtime": 1789675455.8261745,
+    "seen": 1791479305.774594,
+    "ast_hash": "030e5795b3dd9a9a6c922e36024d7499",
+    "semantic_hash": "030e5795b3dd9a9a6c922e36024d7499"
+  },
+  "NlpMusicRecomSystem/Views/Home/HeroBannerView.swift": {
+    "mtime": 1789675455.8263173,
+    "seen": 1791479305.774595,
+    "ast_hash": "820d288ba19f9626e094ad23f72c9c45",
+    "semantic_hash": "820d288ba19f9626e094ad23f72c9c45"
+  },
+  "NlpMusicRecomSystem/Views/Home/HomeView.swift": {
+    "mtime": 1789675455.8264308,
+    "seen": 1791479305.774595,
+    "ast_hash": "0c92b3aeb352a4943b39ed3281e10830",
+    "semantic_hash": "0c92b3aeb352a4943b39ed3281e10830"
+  },
+  "NlpMusicRecomSystem/Views/Home/LandingHomeView.swift": {
+    "mtime": 1791304199.9899998,
+    "seen": 1791479305.7745962,
+    "ast_hash": "8e017ae4b2cdf163dfbbd82d24a62fd1",
+    "semantic_hash": "8e017ae4b2cdf163dfbbd82d24a62fd1"
+  },
+  "NlpMusicRecomSystem/Views/Home/RecommendedSectionView.swift": {
+    "mtime": 1789675455.8266468,
+    "seen": 1791479305.7745972,
+    "ast_hash": "5014b4fe026ecbc52fda6c9d08f1b70a",
+    "semantic_hash": "5014b4fe026ecbc52fda6c9d08f1b70a"
+  },
+  "NlpMusicRecomSystem/Views/MainTabView.swift": {
+    "mtime": 1791284607.6979897,
+    "seen": 1791479305.7745972,
+    "ast_hash": "b56e476faa6cab495d243b7f591d189e",
+    "semantic_hash": "b56e476faa6cab495d243b7f591d189e"
+  },
+  "NlpMusicRecomSystem/Views/Profile/ProfileView.swift": {
+    "mtime": 1791284641.8540769,
+    "seen": 1791479305.774598,
+    "ast_hash": "914a11d57fac60e6f3f3eda182eab12c",
+    "semantic_hash": "914a11d57fac60e6f3f3eda182eab12c"
+  },
+  "NlpMusicRecomSystem/Views/RootView.swift": {
+    "mtime": 1791281496.2586784,
+    "seen": 1791479305.774598,
+    "ast_hash": "99fec8616f1bc5dc71a096f201bcd95c",
+    "semantic_hash": "99fec8616f1bc5dc71a096f201bcd95c"
+  },
+  "NlpMusicRecomSystem/musaiclogofinal.icon/icon.json": {
+    "mtime": 1791473196.651203,
+    "seen": 1791479305.7745988,
+    "ast_hash": "c49bd8983ea3b57f3c2dcb71acbf3c04",
+    "semantic_hash": "c49bd8983ea3b57f3c2dcb71acbf3c04"
+  },
+  "NlpMusicRecomSystemTests/NlpMusicRecomSystemTests.swift": {
+    "mtime": 1789675455.8270934,
+    "seen": 1791479305.7745988,
+    "ast_hash": "e8da85176364377c3f5bfff868dfb552",
+    "semantic_hash": "e8da85176364377c3f5bfff868dfb552"
+  },
+  "NlpMusicRecomSystemUITests/NlpMusicRecomSystemUITests.swift": {
+    "mtime": 1789675455.8272295,
+    "seen": 1791479305.7746,
+    "ast_hash": "0091d63edb3efeda684fd8dfa6b6112d",
+    "semantic_hash": "0091d63edb3efeda684fd8dfa6b6112d"
+  },
+  "NlpMusicRecomSystemUITests/NlpMusicRecomSystemUITestsLaunchTests.swift": {
+    "mtime": 1789675455.827341,
+    "seen": 1791479305.7746,
+    "ast_hash": "cb8a2cdb6d5cf5b30cd3e3dcc251e867",
+    "semantic_hash": "cb8a2cdb6d5cf5b30cd3e3dcc251e867"
+  }
+}
