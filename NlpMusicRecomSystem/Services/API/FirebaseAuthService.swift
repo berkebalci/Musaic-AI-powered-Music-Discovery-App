@@ -31,12 +31,12 @@ final class FirebaseAuthService: AuthServiceProtocol {
 
     init() {
         // Seed with the current Firebase usesr (if already signed in from a previous session)
-        let initial = Auth.auth().currentUser.map { AuthUser(uid: $0.uid, email: $0.email) }
+        let initial = Auth.auth().currentUser.map { AuthUser(uid: $0.uid, email: $0.email, displayName: $0.displayName) }
         currentUserSubject = CurrentValueSubject(initial)
 
         // Listen for future auth state changes (sign in / sign out / token refresh)
         authStateListenerHandle = Auth.auth().addStateDidChangeListener { [weak self] _, firebaseUser in
-            let user = firebaseUser.map { AuthUser(uid: $0.uid, email: $0.email) }
+            let user = firebaseUser.map { AuthUser(uid: $0.uid, email: $0.email, displayName: $0.displayName) }
             self?.currentUserSubject.send(user)
         }
     }
@@ -64,9 +64,15 @@ final class FirebaseAuthService: AuthServiceProtocol {
             
             
         }
-        
-        
-    
+
+    func updateDisplayName(_ name: String) async throws {
+        guard let user = Auth.auth().currentUser else { return }
+        let changeRequest = user.createProfileChangeRequest()
+        changeRequest.displayName = name
+        try await changeRequest.commitChanges()
+        // Auth state listener does not fire on profile changes, so publish the update manually
+        currentUserSubject.send(AuthUser(uid: user.uid, email: user.email, displayName: name))
+    }
 
     func signOut() throws {
         try Auth.auth().signOut()

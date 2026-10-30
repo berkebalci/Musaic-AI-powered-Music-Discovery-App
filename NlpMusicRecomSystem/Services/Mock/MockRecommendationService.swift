@@ -30,6 +30,8 @@ final class MockRecommendationService: RecommendationServiceProtocol {
         return mockCatalog
     }
 
+    func clearCache() {}
+
     func getRecommendations(for moodText: String) async throws -> RecommendationResult {
         // Simulate processing delay
         try await Task.sleep(nanoseconds: 500_000_000)

@@ -23,6 +23,7 @@ struct RootView: View {
     init(container: DIContainer) {
         self.container = container
         _authViewModel = StateObject(wrappedValue: AuthViewModel(authService: container.authService))
+        _currentUser = State(initialValue: container.authService.currentUser)
     }
 
     var body: some View {
@@ -76,11 +77,16 @@ struct RootView: View {
             }
         }
         .onAppear {
-            // Subscribe to auth state changes and update local @State
+            // Subscribe to auth state changes and update local @State only when changed
             container.authService.currentUserPublisher
+                .removeDuplicates()
                 .receive(on: DispatchQueue.main)
                 .sink { user in
                     currentUser = user
+                    // Signed out: drop per-user cached data so the next account starts clean.
+                    if user == nil {
+                        container.recommendationService.clearCache()
+                    }
                 }
                 .store(in: &cancellables)
         }

@@ -44,6 +44,9 @@ final class DiscoveryViewModel: ObservableObject {
     private let recommendationService: any RecommendationServiceProtocol
     private let feedbackService: any FeedbackServiceProtocol
     private let audioplayer: AudioPlayerViewModel
+    /// Invoked after liked songs were successfully persisted on the server,
+    /// so cached favorites elsewhere in the app can be invalidated.
+    private let onLikedSongsSynced: (@MainActor () -> Void)?
 
     // MARK: - Swipe Session State
 
@@ -62,11 +65,13 @@ final class DiscoveryViewModel: ObservableObject {
     init(
         recommendationService: any RecommendationServiceProtocol,
         feedbackService: any FeedbackServiceProtocol,
-        audioPlayer: AudioPlayerViewModel
+        audioPlayer: AudioPlayerViewModel,
+        onLikedSongsSynced: (@MainActor () -> Void)? = nil
     ) {
         self.recommendationService = recommendationService
         self.feedbackService = feedbackService
         self.audioplayer = audioPlayer
+        self.onLikedSongsSynced = onLikedSongsSynced
     }
 
     // MARK: - User Intents
@@ -83,9 +88,8 @@ final class DiscoveryViewModel: ObservableObject {
 
         state = .loading
 
-        // Reset swipe session for the new batch
-        likedSongs = []
-        dislikedSongIds = []
+        // Flush any unsent swipes from the previous batch
+        await submitSwipeSession()
 
         do {
             let result = try await recommendationService.getRecommendations(for: moodText)
@@ -147,9 +151,8 @@ final class DiscoveryViewModel: ObservableObject {
     func fetchSongsWithDefaultMood() async {
         state = .loading
 
-        // Reset swipe session for the new batch
-        likedSongs = []
-        dislikedSongIds = []
+        // Flush any unsent swipes from the previous batch (also refreshes the mood vector)
+        await submitSwipeSession()
 
         do {
             let songs = try await recommendationService.getRecommendations(
@@ -173,11 +176,9 @@ final class DiscoveryViewModel: ObservableObject {
         cards = []
         moodText = ""
         audioplayer.stop()
-        // Only clear session data if not currently submitting
-        if !isSubmitting {
-            likedSongs = []
-            dislikedSongIds = []
-        }
+        // Don't lose swipes made before leaving mid-deck: send them now.
+        // (submitSwipeSession is a no-op when there is nothing to send.)
+        Task { await submitSwipeSession() }
     }
 
     // MARK: - Private Helpers
@@ -207,28 +208,39 @@ final class DiscoveryViewModel: ObservableObject {
             return
         }
 
+        // Snapshot and clear up-front so swipes made while the request is in flight
+        // are neither sent twice nor wiped when the request finishes.
+        let sentLiked = likedSongs
+        let sentDisliked = dislikedSongIds
+        likedSongs = []
+        dislikedSongIds = []
+
         isSubmitting = true
         print("📤 Swipe oturumu gönderiliyor...")
-        print("   - Beğenilen: \(likedSongs.count) şarkı")
-        print("   - Beğenilmeyen: \(dislikedSongIds.count) şarkı")
+        print("   - Beğenilen: \(sentLiked.count) şarkı")
+        print("   - Beğenilmeyen: \(sentDisliked.count) şarkı")
         print("   - Vektör boyutu: \(currentMoodVector.count)")
 
         do {
             let newVector = try await feedbackService.submitSwipeSession(
-                likedSongs: likedSongs,
-                dislikedSongIds: dislikedSongIds,
+                likedSongs: sentLiked,
+                dislikedSongIds: sentDisliked,
                 currentMoodVector: currentMoodVector
             )
             currentMoodVector = newVector
             print("✅ Swipe oturumu başarıyla gönderildi. Yeni vektör: \(newVector)")
+            // Server-side favorites changed only if this batch contained likes.
+            if !sentLiked.isEmpty {
+                onLikedSongsSynced?()
+            }
         } catch {
             print("❌ Swipe oturumu gönderilemedi: \(error)")
             print("   Hata detayı: \(error.localizedDescription)")
+            // Keep the unsent swipes so the next submission retries them.
+            likedSongs = sentLiked + likedSongs
+            dislikedSongIds = sentDisliked + dislikedSongIds
         }
 
-        // Clear session data
-        likedSongs = []
-        dislikedSongIds = []
         isSubmitting = false
     }
 }

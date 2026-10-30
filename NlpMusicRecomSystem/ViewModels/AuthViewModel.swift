@@ -50,12 +50,11 @@ final class AuthViewModel: ObservableObject {
         let nonce = randomNonceString()
         currentNonce = nonce
         request.nonce = sha256(nonce)
-        
-       
     }
     func handlewithSignInWithAppleCompletition(result: Result<ASAuthorization,Error>) {
         if case .failure(_) = result {
             errorMessage = "Failed to sign in with Apple4"
+            isLoading = false
         }
         else if case .success(let success) = result {
             if let appleCredential = success.credential as? ASAuthorizationAppleIDCredential{
@@ -68,11 +67,17 @@ final class AuthViewModel: ObservableObject {
                     return
                 }
                 guard let identityTokenString = String(data: identityToken, encoding: String.Encoding.utf8) else{
-                    print("Failed to convert identity token to string")
+                    errorMessage = "Failed to convert identity token to string"
                     return
                 }
                 
                 let credential = OAuthProvider.credential(providerID: .apple, idToken: identityTokenString, rawNonce: nonce)
+                
+                // Apple only provides fullName on the first sign-in
+                var fullName = ""
+                if let nameComponents = appleCredential.fullName {
+                    fullName = PersonNameComponentsFormatter().string(from: nameComponents)
+                }
                 
                 Task {
                     do {
@@ -81,6 +86,11 @@ final class AuthViewModel: ObservableObject {
                         
                         // İşlem başarılı olduysa nonce'ı temizle
                         self.currentNonce = nil
+                        
+                        // İsim sadece ilk girişte gelir; kaydedilemese bile giriş bozulmasın
+                        if !fullName.isEmpty {
+                            try? await authService.updateDisplayName(fullName)
+                        }
                         
                         // İsteğe bağlı: UI güncellemesi veya yönlendirme
                         print("Apple ile giriş başarılı: \(response)")
@@ -97,6 +107,8 @@ final class AuthViewModel: ObservableObject {
         }
         
     }
+    
+    
     private func randomNonceString(length: Int = 32) -> String {
       precondition(length > 0)
       var randomBytes = [UInt8](repeating: 0, count: length)

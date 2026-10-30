@@ -103,9 +103,7 @@ struct DiscoverySwipeView: View {
                 Spacer()
 
                 // Explicit label placeholder
-                Image(systemName: "e.square.fill")
-                    .font(.system(size: 16))
-                    .foregroundColor(Theme.accentCyan.opacity(0.6))
+                
             }
 
             HStack {
@@ -115,15 +113,6 @@ struct DiscoverySwipeView: View {
                 Spacer()
             }
 
-            // Tags
-            HStack(spacing: 8) {
-                if !song.genre.isEmpty {
-                    tagChip(icon: "guitars.fill", text: song.genre)
-                }
-
-                Spacer()
-            }
-            .padding(.top, 4)
         }
         .padding(.horizontal, 32)
     }

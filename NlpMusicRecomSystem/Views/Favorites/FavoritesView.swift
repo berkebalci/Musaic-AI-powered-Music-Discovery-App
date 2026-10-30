@@ -60,8 +60,9 @@ struct FavoritesView: View {
                     .transition(.move(edge: .bottom))
             }
         }
-        .onAppear {
-            Task { await viewModel.loadFavorites() }
+        .task {
+            // No-op unless favorites were never loaded or a like was submitted since.
+            await viewModel.loadFavoritesIfNeeded()
         }
     }
 

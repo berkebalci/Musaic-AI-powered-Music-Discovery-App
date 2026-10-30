@@ -31,15 +31,21 @@ struct MainTabView: View {
             recommendationService: container.recommendationService
         ))
         
+        // Favorites cache is shared by the Library and Profile tabs.
+        // Discovery tells it to refetch only after liked songs were actually synced to the server.
+        let favoritesVM = FavoritesViewModel(
+            favoritesService: container.favoritesService,
+            appleMusicService: AppleMusicService()
+        )
+        _favoritesViewModel = StateObject(wrappedValue: favoritesVM)
+        
         _discoveryViewModel = StateObject(wrappedValue: DiscoveryViewModel(
             recommendationService: container.recommendationService,
             feedbackService: container.feedbackService,
-            audioPlayer: player
-            
-        ))
-        _favoritesViewModel = StateObject(wrappedValue: FavoritesViewModel(
-            favoritesService: container.favoritesService,
-            appleMusicService: AppleMusicService()
+            audioPlayer: player,
+            onLikedSongsSynced: { [weak favoritesVM] in
+                favoritesVM?.markStale()
+            }
         ))
         
     }
@@ -55,8 +61,7 @@ struct MainTabView: View {
                     LandingHomeView(
                         selectedTab: $selectedTab,
                         recommendationService: container.recommendationService,
-                        audioPlayer: audioPlayerViewModel,
-                        authService: container.authService
+                        audioPlayer: audioPlayerViewModel
                     )
                 case .chat:
                     HomeView(
@@ -74,8 +79,12 @@ struct MainTabView: View {
                         viewModel: favoritesViewModel,
                         audioPlayer: audioPlayerViewModel
                     )
-                // case .profile:  // TODO: Profile sayfası ilerleyen sürümde aktif edilecek
-                //     ProfileView(authService: container.authService)
+                case .profile:
+                    ProfileView(
+                        authService: container.authService,
+                        favoritesViewModel: favoritesViewModel,
+                        audioPlayer: audioPlayerViewModel
+                    )
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

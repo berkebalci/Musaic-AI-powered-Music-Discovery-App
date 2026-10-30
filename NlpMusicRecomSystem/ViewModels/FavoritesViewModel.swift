@@ -42,18 +42,59 @@ final class FavoritesViewModel: ObservableObject {
         self.appleMusicService = appleMusicService
     }
 
+    // MARK: - Cache State
+
+    /// `true` when `favorites` may be out of sync with the server (never loaded,
+    /// last load failed, or a like was submitted since the last load).
+    /// This single flag is what keeps GET /api/favorites calls to a minimum:
+    /// both the Library and Profile tabs share this ViewModel instance.
+    private var needsReload: Bool = true
+
     // MARK: - User Intents
 
+    /// Called when the server-side favorites list has changed (e.g. a swipe session
+    /// containing liked songs was submitted). The next screen that needs favorites
+    /// will refetch; until then no network request is made.
+    func markStale() {
+        needsReload = true
+    }
+
+    /// Loads favorites only if the cache is missing or stale.
+    /// Safe to call from every `.task` / `onAppear` — it is a no-op when nothing changed.
+    func loadFavoritesIfNeeded() async {
+        guard needsReload else { return }
+        await loadFavorites()
+    }
+
+    /// Unconditionally refetches favorites from the server.
     func loadFavorites() async {
+        guard !isLoading else { return }
         isLoading = true
+        // Reset before the request so a markStale() arriving mid-flight is not lost.
+        needsReload = false
         do {
             let rawFavorites = try await favoritesService.fetchFavorites()
+
+            // Reuse songs that were already enriched, so only new songs hit Apple Music.
+            let cachedById = Dictionary(favorites.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+            let merged = rawFavorites.map { raw -> Song in
+                if let cached = cachedById[raw.id], cached.appleMusicId != nil { return cached }
+                return raw
+            }
             // Show songs immediately (without preview URLs) while enrichment loads
-            favorites = rawFavorites
-            // Enrich with Apple Music metadata (artwork, preview URLs, duration)
-            favorites = await enrichWithAppleMusicData(songs: rawFavorites)
+            favorites = merged
+
+            let songsToEnrich = merged.filter { $0.appleMusicId == nil }
+            if !songsToEnrich.isEmpty {
+                // Enrich with Apple Music metadata (artwork, preview URLs, duration)
+                let enriched = await enrichWithAppleMusicData(songs: songsToEnrich)
+                let enrichedById = Dictionary(enriched.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+                favorites = favorites.map { enrichedById[$0.id] ?? $0 }
+            }
         } catch {
             print("[FavoritesVM] Error loading favorites: \(error)")
+            // Let the next appearance retry.
+            needsReload = true
         }
         isLoading = false
     }

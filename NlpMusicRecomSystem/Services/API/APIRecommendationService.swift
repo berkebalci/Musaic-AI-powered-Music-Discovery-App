@@ -24,6 +24,10 @@ final class APIRecommendationService: RecommendationServiceProtocol {
         return preRecommendedSongs
     }
 
+    func clearCache() {
+        preRecommendedSongs = []
+    }
+
     /// Sends the mood text to the API and retrieves recommended songs.
     /// The NLP processing happens entirely on the server side.
     func getRecommendations(for moodText: String) async throws -> RecommendationResult {
@@ -77,7 +81,8 @@ final class APIRecommendationService: RecommendationServiceProtocol {
         }
         
         let enrichedSongs = await fetchAppleMusicData(for: initialSongs)
-        if(preRecommendedSongs.isEmpty){
+        // Do not cache incomplete data if the task was cancelled mid-flight
+        if !Task.isCancelled && preRecommendedSongs.isEmpty {
             preRecommendedSongs = enrichedSongs
         }
         return RecommendationResult(songs: enrichedSongs, moodVector: chatResponse.vector)
@@ -97,8 +102,9 @@ final class APIRecommendationService: RecommendationServiceProtocol {
             song.toDomain(fallbackIndex: index)
         }
         
-        let enrichedSongs =  await fetchAppleMusicData(for: initialSongs)
-        if(preRecommendedSongs.isEmpty){
+        let enrichedSongs = await fetchAppleMusicData(for: initialSongs)
+        // Do not cache incomplete data if the task was cancelled mid-flight
+        if !Task.isCancelled && preRecommendedSongs.isEmpty {
             preRecommendedSongs = enrichedSongs
         }
         return enrichedSongs
@@ -138,7 +144,11 @@ final class APIRecommendationService: RecommendationServiceProtocol {
             }
         }
         
-        print("🟢 [3. AŞAMA BAŞARILI] Tüm şarkılar Apple Music metadatası ile güncellendi.")
+        if Task.isCancelled {
+            print("ℹ️ [3. AŞAMA] İstek iptal edildi (ekrandan çıkıldı veya sekme değişti).")
+        } else {
+            print("🟢 [3. AŞAMA BAŞARILI] Tüm şarkılar Apple Music metadatası ile güncellendi.")
+        }
         return enrichedSongs
     }
 }

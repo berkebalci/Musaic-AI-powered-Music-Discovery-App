@@ -12,11 +12,13 @@ struct RecommendedSectionView: View {
 
     let songs: [Song]
     @ObservedObject var audioPlayer: AudioPlayerViewModel
+    var title: String = "Recommended for You"
+    var limit: Int = 10
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Section header
-            Text("Recommended for You")
+            Text(title)
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(Theme.textPrimary)
                 .padding(.horizontal, 20)
@@ -24,7 +26,7 @@ struct RecommendedSectionView: View {
             // Horizontal scroll cards
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 14) {
-                    ForEach(songs.prefix(10)) { song in
+                    ForEach(songs.prefix(limit)) { song in
                         recommendedCard(song: song)
                     }
                 }

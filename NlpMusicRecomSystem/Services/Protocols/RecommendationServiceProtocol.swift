@@ -21,4 +21,8 @@ protocol RecommendationServiceProtocol {
     func getRecommendations(for vector: [Double], count: Int) async throws -> [Song]
     
     func getPreRecommendedSongList() -> [Song]
+
+    /// Drops cached recommendations. Must be called on sign out so the next
+    /// user does not see the previous user's cached songs.
+    func clearCache()
 }
