@@ -5,7 +5,7 @@
 
 import Foundation
 import Combine
-import FirebaseAuth
+import AuthenticationServices
 
 /// A lightweight representation of the authenticated user,
 /// decoupled from any specific Firebase type.
@@ -26,7 +26,10 @@ protocol AuthServiceProtocol: AnyObject {
     //func signInWithApple() async throws
     func signUp(email: String, password: String) async throws
     func signOut() throws
-    func signInWithApple(credential: OAuthCredential)async throws ->  AuthDataResult
+    /// Configures a Sign in with Apple request (scopes + hashed nonce).
+    func prepareAppleSignInRequest(_ request: ASAuthorizationAppleIDRequest)
+    /// Completes Sign in with Apple using the authorization returned by Apple.
+    func signInWithApple(authorization: ASAuthorization) async throws
     /// Updates the signed-in user's display name (e.g. Apple full name, only provided on first sign-in).
     func updateDisplayName(_ name: String) async throws
     /// Returns a fresh Firebase ID token for API authentication.

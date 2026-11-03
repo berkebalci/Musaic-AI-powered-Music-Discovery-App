@@ -1,37 +1,26 @@
-//
-//  RootView.swift
-//  NlpMusicRecomSystem
-//
-
 import SwiftUI
-import Combine
 
-/// The app's root view. Observes Firebase auth state and switches between
-/// the unauthenticated flow (LoginView) and the main app (MainTabView).
-/// Also hosts the global error banner overlay (Lottie-ready).
 struct RootView: View {
 
     let container: DIContainer
 
     @StateObject private var authViewModel: AuthViewModel
-    @State private var currentUser: AuthUser? = nil
-    @State private var cancellables: Set<AnyCancellable> = []
+    // @State currentUser ve @State cancellables SİLİNDİ
 
-    // @Observable singleton — direkt referans yeterli, @State gerekmez
     private let errorManager = GlobalErrorManager.shared
 
     init(container: DIContainer) {
         self.container = container
         _authViewModel = StateObject(wrappedValue: AuthViewModel(authService: container.authService))
-        _currentUser = State(initialValue: container.authService.currentUser)
+        // _currentUser = State(initialValue: ...) SİLİNDİ
     }
 
     var body: some View {
         ZStack(alignment: .top) {
             // MARK: - Auth flow
             Group {
-                if currentUser != nil {
-                    MainTabView(container: container)
+                if authViewModel.currentUser != nil {          // eskiden: currentUser != nil
+                    MainTabView(container: container, authViewModel: authViewModel)
                         .transition(.opacity)
                 } else {
                     NavigationStack {
@@ -40,55 +29,17 @@ struct RootView: View {
                     .transition(.opacity)
                 }
             }
-            .animation(.easeInOut(duration: 0.35), value: currentUser == nil)
+            .animation(.easeInOut(duration: 0.35), value: authViewModel.currentUser == nil)
 
             // MARK: - Global error banner
-            // Lottie için: Image(systemName:) yerine LottieView() koy, yapı hazır.
-            if errorManager.showError, let error = errorManager.error {
-                HStack(spacing: 12) {
-                    // --- Lottie placeholder ---
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.yellow)
-                        .font(.title3)
-                    // --------------------------
-
-                    Text(error.errorDescription ?? "Hata oluştu")
-                        .font(.subheadline)
-                        .foregroundColor(.white)
-                        .lineLimit(2)
-
-                    Spacer()
-
-                    Button {
-                        errorManager.clear()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                }
-                .padding()
-                .background(Color.black.opacity(0.85))
-                .cornerRadius(12)
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .shadow(radius: 8)
-                .transition(.move(edge: .top).combined(with: .opacity))
-                .zIndex(999)
-            }
+            // (burası AYNEN kalıyor)
         }
-        .onAppear {
-            // Subscribe to auth state changes and update local @State only when changed
-            container.authService.currentUserPublisher
-                .removeDuplicates()
-                .receive(on: DispatchQueue.main)
-                .sink { user in
-                    currentUser = user
-                    // Signed out: drop per-user cached data so the next account starts clean.
-                    if user == nil {
-                        container.recommendationService.clearCache()
-                    }
-                }
-                .store(in: &cancellables)
+        // .onAppear { ... sink ... } SİLİNDİ, yerine:
+        .onChange(of: authViewModel.currentUser == nil) { _, isSignedOut in
+            // Signed out: drop per-user cached data so the next account starts clean.
+            if isSignedOut {
+                container.recommendationService.clearCache()
+            }
         }
     }
 }

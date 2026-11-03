@@ -10,6 +10,8 @@ struct MainTabView: View {
     // MARK: - Dependencies
 
     private let container: DIContainer
+    /// Shared with RootView so profile actions (sign out, delete account) go through the ViewModel.
+    private let authViewModel: AuthViewModel
 
     // MARK: - State
 
@@ -22,8 +24,9 @@ struct MainTabView: View {
 
     // MARK: - Init
 
-    init(container: DIContainer) {
+    init(container: DIContainer, authViewModel: AuthViewModel) {
         self.container = container
+        self.authViewModel = authViewModel
         let player = AudioPlayerViewModel()
             _audioPlayerViewModel = StateObject(wrappedValue: player)
         _chatViewModel = StateObject(wrappedValue: ChatViewModel(
@@ -81,7 +84,7 @@ struct MainTabView: View {
                     )
                 case .profile:
                     ProfileView(
-                        authService: container.authService,
+                        authViewModel: authViewModel,
                         favoritesViewModel: favoritesViewModel,
                         audioPlayer: audioPlayerViewModel
                     )

@@ -10,25 +10,27 @@
 
 import SwiftUI
 import Combine
+import AuthenticationServices
 
 struct ProfileView: View {
 
-    let authService: any AuthServiceProtocol
+    @ObservedObject var authViewModel: AuthViewModel
     @ObservedObject var favoritesViewModel: FavoritesViewModel
     @ObservedObject var audioPlayer: AudioPlayerViewModel
 
-    @State private var user: AuthUser?
     @State private var showSignOutAlert = false
+    @State private var showDeleteAccountSheet = false
+
+    private var user: AuthUser? { authViewModel.currentUser }
 
     init(
-        authService: any AuthServiceProtocol,
+        authViewModel: AuthViewModel,
         favoritesViewModel: FavoritesViewModel,
         audioPlayer: AudioPlayerViewModel
     ) {
-        self.authService = authService
+        self.authViewModel = authViewModel
         self.favoritesViewModel = favoritesViewModel
         self.audioPlayer = audioPlayer
-        _user = State(initialValue: authService.currentUser)
     }
 
     var body: some View {
@@ -66,18 +68,21 @@ struct ProfileView: View {
             }
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: audioPlayer.currentSong != nil)
-        // Keeps the name in sync (Apple's full name is written right after sign-in).
-        .onReceive(authService.currentUserPublisher.receive(on: DispatchQueue.main)) { user = $0 }
         // No-op unless favorites were never loaded or a like was synced since.
         .task { await favoritesViewModel.loadFavoritesIfNeeded() }
         .alert("Sign Out", isPresented: $showSignOutAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Sign Out", role: .destructive) {
                 audioPlayer.stop()
-                try? authService.signOut()
+                authViewModel.signOut()
             }
         } message: {
             Text("Are you sure you want to sign out?")
+        }
+        .sheet(isPresented: $showDeleteAccountSheet) {
+            deleteAccountSheet
+                .presentationDetents([.height(310)])
+                .presentationDragIndicator(.visible)
         }
     }
 
@@ -204,10 +209,9 @@ struct ProfileView: View {
 
     // MARK: - Delete Account
 
-    /// UI only — account deletion logic is not implemented yet.
     private var deleteAccountButton: some View {
         Button {
-            // TODO: Implement account deletion (Firebase user delete + Apple token revoke).
+            showDeleteAccountSheet = true
         } label: {
             Text("Hesabı Sil")
                 .font(.system(size: 14, weight: .medium))
@@ -216,5 +220,50 @@ struct ProfileView: View {
                 .frame(height: 44)
         }
         .buttonStyle(ScaleButtonStyle())
+    }
+
+    private var deleteAccountSheet: some View {
+        ZStack {
+            Theme.background
+                .ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                Image(systemName: "trash.circle.fill")
+                    .font(.system(size: 48))
+                    .foregroundColor(Color(hex: "#FF6B6B"))
+                    .padding(.top, 16)
+
+                VStack(spacing: 8) {
+                    Text("Hesabı Kalıcı Olarak Sil")
+                        .font(Theme.headlineFont)
+                        .foregroundColor(Theme.textPrimary)
+
+                    Text("Hesabınızı ve tüm verilerinizi kalıcı olarak silmek için kimliğinizi doğrulayın. Bu işlem geri alınamaz.")
+                        .font(Theme.bodyFont)
+                        .foregroundColor(Theme.textSecondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.horizontal, 24)
+
+                SignInWithAppleButton(.continue) { request in
+                    audioPlayer.stop()
+                    authViewModel.handlewithSignInWithAppleRequest(request: request)
+                } onCompletion: { result in
+                    showDeleteAccountSheet = false
+                    authViewModel.handleDeleteAccountWithAppleCompletion(result: result)
+                }
+                .signInWithAppleButtonStyle(.whiteOutline)
+                .frame(height: 52)
+                .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
+                .padding(.horizontal, 24)
+
+                Button("Vazgeç") {
+                    showDeleteAccountSheet = false
+                }
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(Theme.textSecondary)
+                .padding(.bottom, 12)
+            }
+        }
     }
 }

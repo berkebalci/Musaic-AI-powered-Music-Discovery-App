@@ -2,11 +2,9 @@
 //  AuthViewModel.swift
 //  NlpMusicRecomSystem
 //
-import CryptoKit
 import Foundation
 import Combine
 import AuthenticationServices
-import FirebaseAuth
 
 /// Drives LoginView and SignUpView — holds field state, loading flag,
 /// and surfaces user-readable error messages.
@@ -20,16 +18,27 @@ final class AuthViewModel: ObservableObject {
     @Published var confirmPassword: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
-    private var currentNonce : String?
+    /// The signed-in user, mirrored from the auth service so views never touch the service directly.
+    @Published private(set) var currentUser: AuthUser?
 
     // MARK: - Private
 
     private let authService: any AuthServiceProtocol
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Init
 
     init(authService: any AuthServiceProtocol) {
         self.authService = authService
+        self.currentUser = authService.currentUser
+
+        authService.currentUserPublisher
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] user in
+                self?.currentUser = user
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Actions
@@ -46,104 +55,34 @@ final class AuthViewModel: ObservableObject {
         isLoading = false
     }
     func handlewithSignInWithAppleRequest(request: ASAuthorizationAppleIDRequest){
-        request.requestedScopes = [.email,.fullName]
-        let nonce = randomNonceString()
-        currentNonce = nonce
-        request.nonce = sha256(nonce)
+        authService.prepareAppleSignInRequest(request)
     }
     func handlewithSignInWithAppleCompletition(result: Result<ASAuthorization,Error>) {
-        if case .failure(_) = result {
+        switch result {
+        case .failure:
             errorMessage = "Failed to sign in with Apple4"
             isLoading = false
-        }
-        else if case .success(let success) = result {
-            if let appleCredential = success.credential as? ASAuthorizationAppleIDCredential{
-                guard let nonce = currentNonce else{
-                    errorMessage = "Invalid State: The Login Callback was received with a code challenge"
-                    return
+        case .success(let authorization):
+            Task {
+                do {
+                    // Nonce doğrulama, Firebase girişi ve isim kaydı serviste yapılır
+                    try await authService.signInWithApple(authorization: authorization)
+                    print("Apple ile giriş başarılı")
+                } catch {
+                    self.errorMessage = "Giriş başarısız: \(error.localizedDescription)"
                 }
-                guard let identityToken = appleCredential.identityToken else{
-                    print("Unable to fetch the identity token")
-                    return
-                }
-                guard let identityTokenString = String(data: identityToken, encoding: String.Encoding.utf8) else{
-                    errorMessage = "Failed to convert identity token to string"
-                    return
-                }
-                
-                let credential = OAuthProvider.credential(providerID: .apple, idToken: identityTokenString, rawNonce: nonce)
-                
-                // Apple only provides fullName on the first sign-in
-                var fullName = ""
-                if let nameComponents = appleCredential.fullName {
-                    fullName = PersonNameComponentsFormatter().string(from: nameComponents)
-                }
-                
-                Task {
-                    do {
-                        // 'try await' ile çağırıyoruz; işlem bitene kadar bekler, hata fırlatırsa catch'e düşer
-                        let response = try await authService.signInWithApple(credential: credential)
-                        
-                        // İşlem başarılı olduysa nonce'ı temizle
-                        self.currentNonce = nil
-                        
-                        // İsim sadece ilk girişte gelir; kaydedilemese bile giriş bozulmasın
-                        if !fullName.isEmpty {
-                            try? await authService.updateDisplayName(fullName)
-                        }
-                        
-                        // İsteğe bağlı: UI güncellemesi veya yönlendirme
-                        print("Apple ile giriş başarılı: \(response)")
-                        
-                        
-                    } catch {
-                        // Hata fırlatıldığında burası yakalar
-                        self.errorMessage = "Giriş başarısız: \(error.localizedDescription)"
-                        self.currentNonce = nil
-                    }
-                }
-                
             }
         }
-        
-    }
-    
-    
-    private func randomNonceString(length: Int = 32) -> String {
-      precondition(length > 0)
-      var randomBytes = [UInt8](repeating: 0, count: length)
-      let errorCode = SecRandomCopyBytes(kSecRandomDefault, randomBytes.count, &randomBytes)
-      if errorCode != errSecSuccess {
-        fatalError(
-          "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
-        )
-      }
-
-      let charset: [Character] =
-        Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
-
-      let nonce = randomBytes.map { byte in
-        // Pick a random character from the set, wrapping around if needed.
-        charset[Int(byte) % charset.count]
-      }
-
-      return String(nonce)
-    }
-    
-    @available(iOS 13, *)
-    private func sha256(_ input: String) -> String {
-      let inputData = Data(input.utf8)
-      let hashedData = SHA256.hash(data: inputData)
-      let hashString = hashedData.compactMap {
-        String(format: "%02x", $0)
-      }.joined()
-
-      return hashString
     }
 
+    /// Called by the delete-account sheet's Sign in with Apple button.
+    /// The request is prepared with `handlewithSignInWithAppleRequest(request:)`;
+    /// this receives the re-authentication result.
+    func handleDeleteAccountWithAppleCompletion(result: Result<ASAuthorization, Error>) {
+        handlewithSignInWithAppleCompletition(result: result)
         
-
-        
+        // TODO: Re-authenticate with `result`, then delete the account (e.g. via authService.deleteUserAccount()).
+    }
 
     func signUp() async {
         guard validate(mode: .signUp) else { return }
