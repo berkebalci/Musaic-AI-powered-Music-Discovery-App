@@ -14,20 +14,20 @@ import AuthenticationServices
 
 struct ProfileView: View {
 
+    @ObservedObject var authManager: AuthManager
     @ObservedObject var authViewModel: AuthViewModel
     @ObservedObject var favoritesViewModel: FavoritesViewModel
     @ObservedObject var audioPlayer: AudioPlayerViewModel
-
     @State private var showSignOutAlert = false
     @State private var showDeleteAccountSheet = false
-
-    private var user: AuthUser? { authViewModel.currentUser }
-
+    private var user: AuthUser? { authManager.currentUser }
     init(
+        authManager: AuthManager,
         authViewModel: AuthViewModel,
         favoritesViewModel: FavoritesViewModel,
         audioPlayer: AudioPlayerViewModel
     ) {
+        self.authManager = authManager
         self.authViewModel = authViewModel
         self.favoritesViewModel = favoritesViewModel
         self.audioPlayer = audioPlayer
@@ -49,7 +49,8 @@ struct ProfileView: View {
                         .padding(.top, 12)
 
                     legalLinks
-
+                    
+                    
                     deleteAccountButton
                         .padding(.horizontal, 24)
 
@@ -84,6 +85,16 @@ struct ProfileView: View {
                 .presentationDetents([.height(310)])
                 .presentationDragIndicator(.visible)
         }
+        .alert("Hata", isPresented: Binding(
+            get: { authViewModel.errorMessage != nil },
+            set: { if !$0 { authViewModel.errorMessage = nil } }
+        )) {
+            Button("Tamam", role: .cancel) {}
+        } message: {
+            if let error = authViewModel.errorMessage {
+                Text(error)
+            }
+        }
     }
 
     // MARK: - Header
@@ -100,8 +111,11 @@ struct ProfileView: View {
             ZStack {
                 Circle()
                     .fill(Theme.primary.opacity(0.12))
-                    .frame(width: 110, height: 110)
-                Image(systemName: "person.circle.fill")
+                    .frame(width: 60, height: 60)
+                Image("musaiclogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60,height: 60)
                     .font(.system(size: 72))
                     .foregroundStyle(
                         LinearGradient(

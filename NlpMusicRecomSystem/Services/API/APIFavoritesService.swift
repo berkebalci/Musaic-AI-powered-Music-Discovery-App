@@ -29,4 +29,28 @@ final class APIFavoritesService: FavoritesServiceProtocol {
         print(a)
         return a
     }
+
+    /// `POST /api/favorites` — body has the same shape as one liked song of `/api/swipe`.
+    func addFavorite(_ song: Song) async throws {
+        let body = LikedSongItemDTO(
+            songId: song.id,
+            title: song.title,
+            artist: song.artistName,
+            albumArt: song.imageUrl ?? "",
+            appleMusicId: song.appleMusicId ?? ""
+        )
+        _ = try await apiClient.post(
+            url: APIEnvironment.favoritesURL,
+            body: body,
+            responseType: FavoriteActionResponseDTO.self
+        )
+    }
+
+    /// `DELETE /api/favorites/{song_id}`
+    func removeFavorite(songId: Int) async throws {
+        _ = try await apiClient.delete(
+            url: APIEnvironment.favoriteURL(songId: songId),
+            responseType: FavoriteActionResponseDTO.self
+        )
+    }
 }

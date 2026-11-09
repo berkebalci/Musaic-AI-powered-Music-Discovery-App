@@ -84,6 +84,7 @@ struct MainTabView: View {
                     )
                 case .profile:
                     ProfileView(
+                        authManager: container.authManager,
                         authViewModel: authViewModel,
                         favoritesViewModel: favoritesViewModel,
                         audioPlayer: audioPlayerViewModel
@@ -100,5 +101,9 @@ struct MainTabView: View {
         }
         .animation(.easeInOut(duration: 0.25), value: isChatActive)
         .ignoresSafeArea(.keyboard)
+        // One shared favorites state for every heart button (mini player, chat cards, now playing).
+        .environmentObject(favoritesViewModel)
+        // Load once up-front so hearts show the right state on every tab. No-op when already cached.
+        .task { await favoritesViewModel.loadFavoritesIfNeeded() }
     }
 }

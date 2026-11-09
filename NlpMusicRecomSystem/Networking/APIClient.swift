@@ -57,6 +57,11 @@ protocol APIClientProtocol {
         url: URL,
         responseType: Response.Type
     ) async throws -> Response
+
+    func delete<Response: Decodable>(
+        url: URL,
+        responseType: Response.Type
+    ) async throws -> Response
 }
 
 // MARK: - URLSession-based API Client
@@ -114,6 +119,22 @@ final class APIClient: APIClientProtocol {
     ) async throws -> Response {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
+        request.timeoutInterval = 15
+
+        // Attach auth token if provider is available
+        try await attachAuthToken(to: &request)
+
+        return try await perform(request, responseType: responseType)
+    }
+
+    // MARK: - DELETE
+
+    func delete<Response: Decodable>(
+        url: URL,
+        responseType: Response.Type
+    ) async throws -> Response {
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
         request.timeoutInterval = 15
 
         // Attach auth token if provider is available

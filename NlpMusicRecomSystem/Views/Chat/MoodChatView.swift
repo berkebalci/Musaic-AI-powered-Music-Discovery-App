@@ -84,7 +84,15 @@ struct MoodChatView: View {
                     }
                 )
                 .padding(.horizontal, 16)
-                .padding(.bottom, 8)
+                .padding(.bottom, 4)
+
+                // AI disclaimer notice
+                Text("Kullanılan yapay zeka modeli hata yapabilir.")
+                    .font(.system(size: 11, weight: .regular))
+                    .foregroundColor(Theme.textTertiary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 6)
             }
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: audioPlayer.currentSong != nil)

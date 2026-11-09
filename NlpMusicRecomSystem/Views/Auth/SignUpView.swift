@@ -5,6 +5,7 @@
 
 import SwiftUI
 
+/*
 struct SignUpView: View {
 
     @ObservedObject var viewModel: AuthViewModel
@@ -202,3 +203,4 @@ struct SignUpView: View {
         }
     }
 }
+*/

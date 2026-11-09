@@ -18,27 +18,16 @@ final class AuthViewModel: ObservableObject {
     @Published var confirmPassword: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
-    /// The signed-in user, mirrored from the auth service so views never touch the service directly.
-    @Published private(set) var currentUser: AuthUser?
 
     // MARK: - Private
 
-    private let authService: any AuthServiceProtocol
-    private var cancellables = Set<AnyCancellable>()
+    /// Single owner of the auth session. This view model only drives form / loading / error state.
+    private let authManager: AuthManager
 
     // MARK: - Init
 
-    init(authService: any AuthServiceProtocol) {
-        self.authService = authService
-        self.currentUser = authService.currentUser
-
-        authService.currentUserPublisher
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] user in
-                self?.currentUser = user
-            }
-            .store(in: &cancellables)
+    init(authManager: AuthManager) {
+        self.authManager = authManager
     }
 
     // MARK: - Actions
@@ -48,14 +37,14 @@ final class AuthViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         do {
-            try await authService.signIn(email: email, password: password)
+            try await authManager.signIn(email: email, password: password)
         } catch {
             errorMessage = friendlyMessage(for: error)
         }
         isLoading = false
     }
     func handlewithSignInWithAppleRequest(request: ASAuthorizationAppleIDRequest){
-        authService.prepareAppleSignInRequest(request)
+        authManager.prepareAppleSignInRequest(request)
     }
     func handlewithSignInWithAppleCompletition(result: Result<ASAuthorization,Error>) {
         switch result {
@@ -66,8 +55,9 @@ final class AuthViewModel: ObservableObject {
             Task {
                 do {
                     // Nonce doğrulama, Firebase girişi ve isim kaydı serviste yapılır
-                    try await authService.signInWithApple(authorization: authorization)
+                    try await authManager.signInWithApple(authorization: authorization)
                     print("Apple ile giriş başarılı")
+                    
                 } catch {
                     self.errorMessage = "Giriş başarısız: \(error.localizedDescription)"
                 }
@@ -79,9 +69,27 @@ final class AuthViewModel: ObservableObject {
     /// The request is prepared with `handlewithSignInWithAppleRequest(request:)`;
     /// this receives the re-authentication result.
     func handleDeleteAccountWithAppleCompletion(result: Result<ASAuthorization, Error>) {
-        handlewithSignInWithAppleCompletition(result: result)
-        
-        // TODO: Re-authenticate with `result`, then delete the account (e.g. via authService.deleteUserAccount()).
+        isLoading = true
+
+        switch result {
+        case .failure(let error):
+            self.errorMessage = "Apple doğrulaması başarısız: \(error.localizedDescription)"
+            self.isLoading = false
+
+        case .success(let authorization):
+            Task {
+                defer { self.isLoading = false }
+                do {
+                    // Reauth, token revoke, server data and Firebase deletion happen in the service;
+                    // AuthManager then clears the session, which makes RootView show the login screen.
+                    try await authManager.deleteAccount(authorization: authorization)
+                    self.errorMessage = nil
+                } catch {
+                    print("❌ Hesap silme başarısız: \(error)")
+                    self.errorMessage = "Hesap silme başarısız: \(error.localizedDescription)"
+                }
+            }
+        }
     }
 
     func signUp() async {
@@ -89,7 +97,7 @@ final class AuthViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         do {
-            try await authService.signUp(email: email, password: password)
+            try await authManager.signUp(email: email, password: password)
         } catch {
             errorMessage = friendlyMessage(for: error)
         }
@@ -97,7 +105,7 @@ final class AuthViewModel: ObservableObject {
     }
 
     func signOut() {
-        try? authService.signOut()
+        authManager.signOut()
     }
 
     func clearFields() {

@@ -10,10 +10,10 @@ import AuthenticationServices
 struct LoginView: View {
 
     @ObservedObject var viewModel: AuthViewModel
-    @State private var showSignUp = false
-    @FocusState private var focusedField: AuthField?
+    // @State private var showSignUp = false
+    // @FocusState private var focusedField: AuthField?
 
-    private enum AuthField { case email, password }
+    // private enum AuthField { case email, password }
 
     var body: some View {
         ZStack {
@@ -36,46 +36,71 @@ struct LoginView: View {
             }
             .ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: 0) {
-                    Spacer().frame(height: 60)
+            GeometryReader { geometry in
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        Spacer()
 
-                    // Logo / Title
-                    VStack(spacing: 12) {
-                        ZStack {
-                            Circle()
-                                .fill(Theme.accentCyan.opacity(0.15))
-                                .frame(width: 100, height: 100)
-                            Image("musaiclogo")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 66, height: 66)
-                                .clipShape(Circle())
+                        // Logo / Title
+                        VStack(spacing: 12) {
+                            ZStack {
+                                Circle()
+                                    .fill(Theme.accentCyan.opacity(0.15))
+                                    .frame(width: 100, height: 100)
+                                Image("musaiclogo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 66, height: 66)
+                                    .clipShape(Circle())
+                            }
+
+                            Text("Welcome Back")
+                                .font(.system(size: 32, weight: .bold, design: .rounded))
+                                .foregroundColor(Theme.textPrimary)
+
+                            Text("Sign in to continue your music journey")
+                                .font(Theme.bodyFont)
+                                .foregroundColor(Theme.textSecondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .padding(.bottom, 44)
+                        
+                        // Sign in with Apple
+                        SignInWithAppleButton(.signIn) { request in
+                            viewModel.handlewithSignInWithAppleRequest(request: request)
+                        } onCompletion: { result in
+                            viewModel.handlewithSignInWithAppleCompletition(result: result)
+                        }
+                        .signInWithAppleButtonStyle(.whiteOutline)
+                        .frame(height: 54)
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
+                        .padding(.horizontal, 24)
+                        .disabled(viewModel.isLoading)
+
+                        // Loading indicator for Apple Sign In
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .tint(.white)
+                                .padding(.top, 20)
                         }
 
-                        Text("Welcome Back")
-                            .font(.system(size: 32, weight: .bold, design: .rounded))
-                            .foregroundColor(Theme.textPrimary)
+                        // Error message
+                        if let error = viewModel.errorMessage {
+                            ErrorBanner(message: error)
+                                .padding(.horizontal, 24)
+                                .padding(.top, 16)
+                        }
 
-                        Text("Sign in to continue your music journey")
-                            .font(Theme.bodyFont)
-                            .foregroundColor(Theme.textSecondary)
+                        // Terms & Privacy Notice
+                        Text(legalNoticeText)
+                            .font(Theme.captionFont)
+                            .foregroundColor(Theme.textTertiary)
                             .multilineTextAlignment(.center)
-                    }
-                    .padding(.bottom, 44)
-                    
-                    // Sign in with Apple
-                    SignInWithAppleButton(.signIn) { request in
-                        viewModel.handlewithSignInWithAppleRequest(request: request)
-                    } onCompletion: { result in
-                        viewModel.handlewithSignInWithAppleCompletition(result: result)
-                    }
-                    .signInWithAppleButtonStyle(.whiteOutline)
-                    .frame(height: 54)
-                    .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 28)
-                    
+                            .tint(Theme.accentCyan)
+                            .padding(.horizontal, 32)
+                            .padding(.top, 24)
+
+                    /*
                     HStack {
                         Rectangle().fill(Theme.cardBorder).frame(height: 1)
                         Text("or").font(Theme.captionFont).foregroundColor(Theme.textTertiary).padding(.horizontal, 12)
@@ -167,14 +192,29 @@ struct LoginView: View {
                             )
                         )
                     }
+                    */
 
-                    Spacer().frame(height: 40)
+                        Spacer()
+                    }
+                    .frame(minHeight: geometry.size.height)
                 }
             }
             .scrollDismissesKeyboard(.interactively)
         }
+        /*
         .navigationDestination(isPresented: $showSignUp) {
             SignUpView(viewModel: viewModel)
         }
+        */
+    }
+
+    // MARK: - Legal Notice
+
+    private var legalNoticeText: AttributedString {
+        let text = "Giriş yaparak [Kullanım Koşulları](\(AppLinks.termsOfUse.absoluteString)) ve [Gizlilik Sözleşmesi](\(AppLinks.privacyPolicy.absoluteString))'ni kabul etmiş olursunuz."
+        if let attributed = try? AttributedString(markdown: text) {
+            return attributed
+        }
+        return AttributedString("Giriş yaparak Kullanım Koşulları ve Gizlilik Sözleşmesi'ni kabul etmiş olursunuz.")
     }
 }

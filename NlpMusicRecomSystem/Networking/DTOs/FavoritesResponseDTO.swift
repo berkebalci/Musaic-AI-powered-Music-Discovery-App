@@ -14,6 +14,13 @@ struct FavoritesResponseDTO: Decodable {
     let hasMore: Bool
 }
 
+/// Response from `POST /api/favorites` and `DELETE /api/favorites/{song_id}`
+/// (e.g. `{"status": "success", "song_id": 123}`). Only the status is read,
+/// and it is optional so extra/missing fields never fail decoding.
+struct FavoriteActionResponseDTO: Decodable {
+    let status: String?
+}
+
 /// Individual favorite song from the API response.
 /// Matches the server response fields:
 /// ```python

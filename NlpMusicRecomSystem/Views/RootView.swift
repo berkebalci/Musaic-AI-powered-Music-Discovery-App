@@ -4,22 +4,23 @@ struct RootView: View {
 
     let container: DIContainer
 
+    /// The one shared auth state. Every sign in / sign out / account deletion ends up here on MainActor.
+    @ObservedObject private var authManager: AuthManager
     @StateObject private var authViewModel: AuthViewModel
-    // @State currentUser ve @State cancellables SİLİNDİ
 
     private let errorManager = GlobalErrorManager.shared
 
     init(container: DIContainer) {
         self.container = container
-        _authViewModel = StateObject(wrappedValue: AuthViewModel(authService: container.authService))
-        // _currentUser = State(initialValue: ...) SİLİNDİ
+        _authManager = ObservedObject(wrappedValue: container.authManager)
+        _authViewModel = StateObject(wrappedValue: AuthViewModel(authManager: container.authManager))
     }
 
     var body: some View {
         ZStack(alignment: .top) {
             // MARK: - Auth flow
             Group {
-                if authViewModel.currentUser != nil {          // eskiden: currentUser != nil
+                if authManager.isAuthenticated {
                     MainTabView(container: container, authViewModel: authViewModel)
                         .transition(.opacity)
                 } else {
@@ -29,16 +30,17 @@ struct RootView: View {
                     .transition(.opacity)
                 }
             }
-            .animation(.easeInOut(duration: 0.35), value: authViewModel.currentUser == nil)
+            .animation(.easeInOut(duration: 0.35), value: authManager.isAuthenticated)
 
             // MARK: - Global error banner
             // (burası AYNEN kalıyor)
         }
-        // .onAppear { ... sink ... } SİLİNDİ, yerine:
-        .onChange(of: authViewModel.currentUser == nil) { _, isSignedOut in
-            // Signed out: drop per-user cached data so the next account starts clean.
-            if isSignedOut {
+        .onChange(of: authManager.isAuthenticated) { _, isAuthenticated in
+            // Signed out or account deleted: drop per-user cached data and form state
+            // so the next account starts clean.
+            if !isAuthenticated {
                 container.recommendationService.clearCache()
+                authViewModel.clearFields()
             }
         }
     }

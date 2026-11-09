@@ -13,7 +13,11 @@ final class FavoritesViewModel: ObservableObject {
 
     // MARK: - Published State
 
-    @Published var favorites: [Song] = []
+    @Published var favorites: [Song] = [] {
+        didSet { favoriteIds = Set(favorites.map(\.id)) }
+    }
+    /// IDs of the favorited songs, kept in sync with `favorites` for O(1) heart-button lookups.
+    @Published private(set) var favoriteIds: Set<Int> = []
     @Published var isLoading: Bool = false
     @Published var searchText: String = ""
 
@@ -49,6 +53,8 @@ final class FavoritesViewModel: ObservableObject {
     /// This single flag is what keeps GET /api/favorites calls to a minimum:
     /// both the Library and Profile tabs share this ViewModel instance.
     private var needsReload: Bool = true
+    /// Song IDs with an add/remove request in flight (guards against double taps).
+    private var pendingToggleIds: Set<Int> = []
 
     // MARK: - User Intents
 
@@ -97,6 +103,42 @@ final class FavoritesViewModel: ObservableObject {
             needsReload = true
         }
         isLoading = false
+    }
+
+    // MARK: - Favorite Toggle
+
+    /// Whether the song is currently in the user's favorites.
+    func isFavorite(_ song: Song) -> Bool {
+        favoriteIds.contains(song.id)
+    }
+
+    /// Adds the song to favorites, or removes it if it already is one.
+    /// The UI updates immediately (optimistic) and is rolled back if the request fails
+    /// (the failure itself is surfaced by the API client's global error handling).
+    func toggleFavorite(_ song: Song) async {
+        // Ignore rapid repeated taps while a request for this song is in flight.
+        guard !pendingToggleIds.contains(song.id) else { return }
+        pendingToggleIds.insert(song.id)
+        defer { pendingToggleIds.remove(song.id) }
+
+        if favoriteIds.contains(song.id) {
+            guard let index = favorites.firstIndex(where: { $0.id == song.id }) else { return }
+            let removed = favorites.remove(at: index)
+            do {
+                try await favoritesService.removeFavorite(songId: song.id)
+            } catch {
+                print("[FavoritesVM] Error removing favorite: \(error)")
+                favorites.insert(removed, at: min(index, favorites.count))
+            }
+        } else {
+            favorites.insert(song, at: 0)
+            do {
+                try await favoritesService.addFavorite(song)
+            } catch {
+                print("[FavoritesVM] Error adding favorite: \(error)")
+                favorites.removeAll { $0.id == song.id }
+            }
+        }
     }
 
     /// Plays a song via the audio player. If the song lacks a preview URL,

@@ -11,20 +11,21 @@ final class DIContainer {
     let recommendationService: any RecommendationServiceProtocol
     let favoritesService: any FavoritesServiceProtocol
     let feedbackService: any FeedbackServiceProtocol
-    let authService: any AuthServiceProtocol
+    /// Single owner of auth state, shared by every screen.
+    let authManager: AuthManager
     let chatService: any ChatServiceProtocol
 
     init(
         recommendationService: any RecommendationServiceProtocol,
         favoritesService: any FavoritesServiceProtocol,
         feedbackService: any FeedbackServiceProtocol,
-        authService: any AuthServiceProtocol,
+        authManager: AuthManager,
         chatService: any ChatServiceProtocol
     ) {
         self.recommendationService = recommendationService
         self.favoritesService = favoritesService
         self.feedbackService = feedbackService
-        self.authService = authService
+        self.authManager = authManager
         self.chatService = chatService
     }
 
@@ -34,7 +35,7 @@ final class DIContainer {
             recommendationService: MockRecommendationService(),
             favoritesService: MockFavoritesService(),
             feedbackService: MockFeedbackService(),
-            authService: FirebaseAuthService(),
+            authManager: AuthManager(authService: FirebaseAuthService()),
             chatService: MockChatService()
         )
     }
@@ -55,7 +56,7 @@ final class DIContainer {
             recommendationService: APIRecommendationService(apiClient: apiClient, appleMusicService: AppleMusicService()),
             favoritesService: APIFavoritesService(apiClient: apiClient),
             feedbackService: APIFeedbackService(apiClient: apiClient),
-            authService: authService,
+            authManager: AuthManager(authService: authService),
             chatService: APIChatService(apiClient: apiClient)
         )
     }

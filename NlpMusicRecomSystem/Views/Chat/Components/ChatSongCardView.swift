@@ -79,6 +79,9 @@ struct ChatSongCardView: View {
 
             Spacer()
 
+            // Add / remove from favorites
+            FavoriteButton(song: song, size: 16)
+
             // Now-playing indicator or play button
             if isCurrentSong && audioPlayer.isPlaying {
                 // Animated bars

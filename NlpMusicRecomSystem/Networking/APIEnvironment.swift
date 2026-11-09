@@ -60,4 +60,14 @@ enum APIEnvironment {
     static var favoritesURL: URL {
         baseURL.appendingPathComponent("api/favorites")
     }
+
+    /// POST /api/favorites (add)  ·  DELETE /api/favorites/{song_id} (remove)
+    static func favoriteURL(songId: Int) -> URL {
+        favoritesURL.appendingPathComponent(String(songId))
+    }
+
+    /// DELETE /api/account
+    static var accountURL: URL {
+        baseURL.appendingPathComponent("api/account")
+    }
 }

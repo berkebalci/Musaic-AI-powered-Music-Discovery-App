@@ -8,7 +8,8 @@ import SwiftUI
 struct MiniPlayerView: View {
 
     @ObservedObject var audioPlayer: AudioPlayerViewModel
-    
+    /// Presents the large "now playing" card when the artwork is tapped.
+    @State private var showNowPlaying = false
 
     var body: some View {
         if let song = audioPlayer.currentSong {
@@ -26,21 +27,27 @@ struct MiniPlayerView: View {
                 .frame(height: 2)
 
                 HStack(spacing: 12) {
-                    // Album art
-                    if let artworkURL = song.artworkURL {
-                        AsyncImage(url: artworkURL) { phase in
-                            if let image = phase.image {
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 44, height: 44)
-                                    .cornerRadius(8)
-                            } else {
-                                AlbumArtPlaceholder(songId: song.id, size: 44, cornerRadius: 8)
+                    // Album art (tap to open the large now-playing card)
+                    Button {
+                        showNowPlaying = true
+                    } label: {
+                        if let artworkURL = song.artworkURL {
+                            AsyncImage(url: artworkURL) { phase in
+                                if let image = phase.image {
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 44, height: 44)
+                                        .cornerRadius(8)
+                                } else {
+                                    AlbumArtPlaceholder(songId: song.id, size: 44, cornerRadius: 8)
+                                }
                             }
-                        }
-                    } else {
-                        AlbumArtPlaceholder(songId: song.id, size: 48, cornerRadius: 8)}
+                        } else {
+                            AlbumArtPlaceholder(songId: song.id, size: 48, cornerRadius: 8)}
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Show now playing")
 
                     // Song info
                     VStack(alignment: .leading, spacing: 2) {
@@ -58,12 +65,16 @@ struct MiniPlayerView: View {
                     Spacer()
 
                     // Playback controls
-                    HStack(spacing: 18) {
+                    HStack(spacing: 16) {
+                        FavoriteButton(song: song, size: 16)
+
+                        /*
                         Button {} label: {
                             Image(systemName: "backward.fill")
                                 .font(.system(size: 14))
                                 .foregroundColor(Theme.accentCyan)
                         }
+                        */
 
                         Button {
                             audioPlayer.togglePlayback()
@@ -73,11 +84,13 @@ struct MiniPlayerView: View {
                                 .foregroundColor(Theme.accentCyan)
                         }
 
+                        /*
                         Button {} label: {
                             Image(systemName: "forward.fill")
                                 .font(.system(size: 14))
                                 .foregroundColor(Theme.accentCyan)
                         }
+                        */
                     }
                 }
                 .padding(.horizontal, 14)
@@ -92,6 +105,11 @@ struct MiniPlayerView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(Theme.accentCyan.opacity(0.25), lineWidth: 1)
             )
+            .sheet(isPresented: $showNowPlaying) {
+                NowPlayingView(audioPlayer: audioPlayer)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
+            }
         }
     }
 }
