@@ -50,3 +50,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 .ipynb_checkpoints/
+
+# Graphify
+graphify-out/
+.graphify*/
+*.graphify*

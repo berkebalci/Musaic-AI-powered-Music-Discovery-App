@@ -8,3 +8,9 @@
 
 *.json linguist-vendored
 *.json linguist-detectable=false
+
+*.html linguist-vendored
+*.html linguist-detectable=false
+
+graphify-out/** linguist-vendored
+graphify-out/** linguist-detectable=false
