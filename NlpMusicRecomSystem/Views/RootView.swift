@@ -31,9 +31,24 @@ struct RootView: View {
                 }
             }
             .animation(.easeInOut(duration: 0.35), value: authManager.isAuthenticated)
-
+            
             // MARK: - Global error banner
-            // (burası AYNEN kalıyor)
+            if errorManager.hasError {
+                ErrorBanner(message: errorManager.displayMessage) {
+                    errorManager.clear()
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .zIndex(1)
+            }
+        }
+        .onChange(of: authViewModel.errorMessage) { _, message in
+            // Login-screen auth errors use the global banner (Profile keeps its own alert)
+            if let message, !authManager.isAuthenticated {
+                errorManager.handle(message: message)
+                authViewModel.errorMessage = nil
+            }
         }
         .onChange(of: authManager.isAuthenticated) { _, isAuthenticated in
             // Signed out or account deleted: drop per-user cached data and form state

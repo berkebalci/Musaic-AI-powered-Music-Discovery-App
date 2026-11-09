@@ -8,7 +8,7 @@
 import Foundation
 
 /// Response from `GET /health`.
-struct HealthResponseDTO: Decodable {
+nonisolated struct HealthResponseDTO: Decodable, Sendable {
     let status: String
     let apiSecure: Bool?
 

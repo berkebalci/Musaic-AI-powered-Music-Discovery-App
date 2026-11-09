@@ -47,18 +47,18 @@ enum APIError: Error, LocalizedError {
 // MARK: - API Client Protocol
 
 protocol APIClientProtocol {
-    func post<Request: Encodable, Response: Decodable>(
+    func post<Request: Encodable, Response: Decodable & Sendable>(
         url: URL,
         body: Request,
         responseType: Response.Type
     ) async throws -> Response
 
-    func get<Response: Decodable>(
+    func get<Response: Decodable & Sendable>(
         url: URL,
         responseType: Response.Type
     ) async throws -> Response
 
-    func delete<Response: Decodable>(
+    func delete<Response: Decodable & Sendable>(
         url: URL,
         responseType: Response.Type
     ) async throws -> Response
@@ -92,7 +92,7 @@ final class APIClient: APIClientProtocol {
 
     // MARK: - POST
 
-    func post<Request: Encodable, Response: Decodable>(
+    func post<Request: Encodable, Response: Decodable & Sendable>(
         url: URL,
         body: Request,
         responseType: Response.Type
@@ -113,7 +113,7 @@ final class APIClient: APIClientProtocol {
 
     // MARK: - GET
 
-    func get<Response: Decodable>(
+    func get<Response: Decodable & Sendable>(
         url: URL,
         responseType: Response.Type
     ) async throws -> Response {
@@ -129,7 +129,7 @@ final class APIClient: APIClientProtocol {
 
     // MARK: - DELETE
 
-    func delete<Response: Decodable>(
+    func delete<Response: Decodable & Sendable>(
         url: URL,
         responseType: Response.Type
     ) async throws -> Response {
@@ -161,7 +161,7 @@ final class APIClient: APIClientProtocol {
 
     // MARK: - Core Request Execution
 
-    private func perform<Response: Decodable>(
+    private func perform<Response: Decodable & Sendable>(
         _ request: URLRequest,
         responseType: Response.Type
     ) async throws -> Response {

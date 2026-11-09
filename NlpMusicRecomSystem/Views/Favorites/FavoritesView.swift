@@ -70,11 +70,7 @@ struct FavoritesView: View {
 
     private var header: some View {
         HStack {
-            Button {} label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(Theme.textPrimary)
-            }
+            
 
             Spacer()
 

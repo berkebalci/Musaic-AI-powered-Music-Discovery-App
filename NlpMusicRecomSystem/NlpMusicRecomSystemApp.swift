@@ -29,7 +29,7 @@ struct NlpMusicRecomSystemApp: App {
                 .task {
                     // Request Apple Music access on app launch
                     let status = await MusicAuthorization.request()
-                    print("Apple Music Authorization Status: \\(status)")
+                    print("Apple Music Authorization Status: \(status)")
                 }
         }
     }

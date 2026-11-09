@@ -70,7 +70,7 @@ struct HomeView: View {
                 MoodChatView(viewModel: chatViewModel, audioPlayer: audioPlayer)
             }
         }
-        .onChange(of: showChat) { newValue in
+        .onChange(of: showChat) { _, newValue in
             isChatActive = newValue
         }
     }

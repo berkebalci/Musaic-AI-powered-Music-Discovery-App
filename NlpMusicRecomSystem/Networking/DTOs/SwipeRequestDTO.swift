@@ -19,7 +19,7 @@ import Foundation
 ///     album_art: Optional[str] = ""
 ///     apple_music_id: Optional[str] = ""
 /// ```
-struct LikedSongItemDTO: Encodable {
+nonisolated struct LikedSongItemDTO: Encodable, Sendable {
     let songId: Int
     let title: String
     let artist: String
@@ -35,7 +35,7 @@ struct LikedSongItemDTO: Encodable {
 ///     disliked_song_ids: List[int]
 ///     current_mood_vector: List[float]
 /// ```
-struct BatchSwipeRequestDTO: Encodable {
+nonisolated struct BatchSwipeRequestDTO: Encodable, Sendable {
     let likedSongs: [LikedSongItemDTO]
     let dislikedSongIds: [Int]
     let currentMoodVector: [Double]
@@ -44,7 +44,7 @@ struct BatchSwipeRequestDTO: Encodable {
 /// Response from `POST /api/swipe`.
 /// API returns: {"status": "success", "new_profile_vector": [...], "liked_count": N}
 /// Note: APIClient uses `.convertFromSnakeCase` so property names auto-map.
-struct BatchSwipeResponseDTO: Decodable {
+nonisolated struct BatchSwipeResponseDTO: Decodable, Sendable {
     let status: String
     let newProfileVector: [Double]
     let likedCount: Int

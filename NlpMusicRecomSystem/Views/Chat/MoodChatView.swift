@@ -58,7 +58,7 @@ struct MoodChatView: View {
                         }
                     }
                     .scrollDismissesKeyboard(.interactively)
-                    .onChange(of: viewModel.messages.count) { _ in
+                    .onChange(of: viewModel.messages.count) {
                         if let lastId = viewModel.messages.last?.id {
                             withAnimation(.easeOut(duration: 0.3)) {
                                 scrollProxy.scrollTo(lastId, anchor: .bottom)

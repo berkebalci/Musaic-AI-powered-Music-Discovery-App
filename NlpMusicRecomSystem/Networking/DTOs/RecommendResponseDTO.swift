@@ -9,14 +9,14 @@ import Foundation
 
 /// Response from `POST /api/recommend`.
 /// The structure is returned by the `RecommendationEngine.recommend()` on the server.
-struct RecommendResponseDTO: Decodable {
+nonisolated struct RecommendResponseDTO: Decodable, Sendable {
     let mode: String?
     let feed: [SongDTO]
 }
 
 /// Individual song from the API response.
 /// Maps to the data returned by the recommendation engine.
-struct SongDTO: Decodable {
+nonisolated struct SongDTO: Decodable, Sendable {
     let songId: Int?
     let trackName: String?
     let artists: String?

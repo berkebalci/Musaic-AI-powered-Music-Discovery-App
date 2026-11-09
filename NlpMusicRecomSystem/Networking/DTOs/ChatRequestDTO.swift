@@ -16,7 +16,7 @@ import Foundation
 ///     message: str
 ///     current_session_vector: List[float]  # 9D mood vector
 /// ```
-struct ChatRequestDTO: Encodable {
+nonisolated struct ChatRequestDTO: Encodable, Sendable {
     let message: String
     /// The current session mood vector (9D).
     /// Sent to the backend so the AI can refine the mood cumulatively.
@@ -31,7 +31,7 @@ struct ChatRequestDTO: Encodable {
 /// Response from `POST /api/chat`.
 /// The vector contains 9 Spotify audio features:
 /// [danceability, energy, valence, tempo, acousticness, instrumentalness, speechiness, loudness, liveness]
-struct ChatResponseDTO: Decodable {
+nonisolated struct ChatResponseDTO: Decodable, Sendable {
     let reply: String
     let vector: [Double]
 }

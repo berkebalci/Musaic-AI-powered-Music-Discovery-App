@@ -15,7 +15,7 @@ import Foundation
 ///     mood_vector: List[float]
 ///     n: int = 15
 /// ```
-struct RecommendRequestDTO: Encodable {
+nonisolated struct RecommendRequestDTO: Encodable, Sendable {
     let moodVector: [Double]
     let n: Int
 

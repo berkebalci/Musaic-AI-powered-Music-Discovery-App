@@ -9,7 +9,7 @@ import Foundation
 
 /// Response from `GET /api/favorites`.
 /// Returns a paginated list of favorited songs.
-struct FavoritesResponseDTO: Decodable {
+nonisolated struct FavoritesResponseDTO: Decodable, Sendable {
     let favorites: [FavoriteSongDTO]
     let hasMore: Bool
 }
@@ -17,7 +17,7 @@ struct FavoritesResponseDTO: Decodable {
 /// Response from `POST /api/favorites` and `DELETE /api/favorites/{song_id}`
 /// (e.g. `{"status": "success", "song_id": 123}`). Only the status is read,
 /// and it is optional so extra/missing fields never fail decoding.
-struct FavoriteActionResponseDTO: Decodable {
+nonisolated struct FavoriteActionResponseDTO: Decodable, Sendable {
     let status: String?
 }
 
@@ -33,7 +33,7 @@ struct FavoriteActionResponseDTO: Decodable {
 ///     "added_at": "..."
 /// }
 /// ```
-struct FavoriteSongDTO: Decodable {
+nonisolated struct FavoriteSongDTO: Decodable, Sendable {
     let songId: String
     let title: String
     let artist: String

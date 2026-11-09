@@ -84,12 +84,7 @@ struct LoginView: View {
                                 .padding(.top, 20)
                         }
 
-                        // Error message
-                        if let error = viewModel.errorMessage {
-                            ErrorBanner(message: error)
-                                .padding(.horizontal, 24)
-                                .padding(.top, 16)
-                        }
+                        // Errors are shown by the global banner in RootView
 
                         // Terms & Privacy Notice
                         Text(legalNoticeText)

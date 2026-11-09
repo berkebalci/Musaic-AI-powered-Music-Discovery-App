@@ -68,6 +68,8 @@ struct AuthTextField: View {
 /// A red-tinted inline banner for displaying auth error messages.
 struct ErrorBanner: View {
     let message: String
+    /// When set, a close (X) button is shown.
+    var onDismiss: (() -> Void)? = nil
 
     var body: some View {
         HStack(spacing: 10) {
@@ -77,6 +79,17 @@ struct ErrorBanner: View {
                 .font(Theme.captionFont)
                 .foregroundColor(Color(hex: "#FF6B6B"))
                 .fixedSize(horizontal: false, vertical: true)
+                .contentTransition(.numericText())
+            if let onDismiss {
+                Spacer(minLength: 4)
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(Color(hex: "#FF6B6B"))
+                        .padding(6)
+                }
+                .accessibilityLabel("Kapat")
+            }
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
@@ -90,6 +103,6 @@ struct ErrorBanner: View {
                 )
         )
         .transition(.move(edge: .top).combined(with: .opacity))
-        .animation(.spring(response: 0.4), value: message)
+        .animation(.default, value: message)
     }
 }

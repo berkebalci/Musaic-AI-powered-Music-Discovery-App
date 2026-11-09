@@ -140,7 +140,7 @@ final class AudioPlayerViewModel: ObservableObject {
             object: player?.currentItem,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.isPlaying = false
                 self.progress = 0
@@ -168,7 +168,7 @@ final class AudioPlayerViewModel: ObservableObject {
     private func startSimulation() {
         stopSimulation()
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 guard let self else { return }
                 if self.progress < self.duration {
                     self.progress += 0.1
